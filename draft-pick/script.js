@@ -96,7 +96,7 @@ function renderDraftState(data, displayPickIndex, isShowingPrevious = false) {
     const captainFocus = document.getElementById('captain-focus');
     captainFocus.style.setProperty('--team-color', teamColor);
     captainFocus.innerHTML = `
-        <div class="team-number">TEAM ${teamIndexToDisplay + 1} ${isShowingPrevious ? '(PICKED)' : ''}</div>
+        <div class="team-number">TEAM ${teamIndexToDisplay + 1}</div>
         <img src="${team.captain.avatarUrl}" class="focus-avatar">
         <div class="focus-name">${team.captain.username}</div>
     `;
