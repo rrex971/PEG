@@ -59,102 +59,25 @@ async function updatePick() {
         const picks = data.draft.picks || [];
         const currentPickIndex = picks.length;
 
-        // Flash highlight and scroll to pick if a new pick happened
+        // If a new pick happened, we want to show the PREVIOUS team with the NEW pick first
         if (lastPickCount !== -1 && currentPickIndex > lastPickCount) {
-            // Wait 3 seconds before updating the UI to show the new pick
-            await new Promise(resolve => setTimeout(resolve, 3000));
-        }
-        lastPickCount = currentPickIndex;
-
-        const currentTeamIndex = data.draft.snakeOrder[currentPickIndex];
-        const team = data.draft.teams[currentTeamIndex];
-        const teamColor = ACCENT_COLORS[currentTeamIndex % ACCENT_COLORS.length];
-
-        // Update Captain Focus
-        const captainFocus = document.getElementById('captain-focus');
-        captainFocus.style.setProperty('--team-color', teamColor);
-        captainFocus.innerHTML = `
-            <div class="team-number">TEAM ${currentTeamIndex + 1}</div>
-            <img src="${team.captain.avatarUrl}" class="focus-avatar">
-            <div class="focus-name">${team.captain.username}</div>
-        `;
-
-        // Update Team Members (7 slots)
-        const teamMembers = document.getElementById('team-members');
-        let membersHTML = '';
-        for (let i = 0; i < 7; i++) {
-            const player = team.players[i];
-            if (player) {
-                membersHTML += `
-                    <div class="member-slot filled">
-                        <img src="${player.avatarUrl}" class="member-avatar">
-                        <span class="member-name">${player.username}</span>
-                    </div>
-                `;
-            } else {
-                membersHTML += `<div class="member-slot">${i + 1}</div>`;
-            }
-        }
-        teamMembers.innerHTML = membersHTML;
-
-        // Update Available Players
-        const availableContainer = document.getElementById('available-players');
-        const pickedUserIds = new Set(data.draft.teams.flatMap(t => t.players.map(p => parseInt(p.osuId))));
-        const captainIds = new Set(data.draft.teams.map(t => parseInt(t.captain.osuId)));
-        
-        // Filter out captains first, then take the top 112
-        const eligiblePool = qualifiedPlayers
-            .filter(player => !captainIds.has(player.userId))
-            .slice(0, 112);
-        
-        // Animate removal of picked players
-        const existingCards = Array.from(availableContainer.querySelectorAll('.available-card'));
-        existingCards.forEach(card => {
-            const userId = parseInt(card.id.replace('player-', ''));
-            if (pickedUserIds.has(userId)) {
-                card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0)';
-                setTimeout(() => card.remove(), 500);
-            }
-        });
-
-        // Add new cards if they don't exist
-        eligiblePool.forEach(player => {
-            const isPicked = pickedUserIds.has(player.userId);
-            if (!isPicked && !document.getElementById(`player-${player.userId}`)) {
-                const card = document.createElement('div');
-                card.className = 'available-card';
-                card.id = `player-${player.userId}`;
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0)';
-                card.innerHTML = `
-                    <img src="${player.avatarUrl}" class="available-avatar">
-                    <div class="player-info">
-                        <div class="player-name">${player.username}</div>
-                    </div>
-                    <div class="player-seed-badge">#${player.seed}</div>
-                `;
-                availableContainer.appendChild(card);
-                
-                // Trigger animation
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-                    card.style.opacity = '1';
-                    card.style.transform = 'scale(1)';
-                }, 50);
-            }
-        });
-
-        // Flash highlight if a new pick happened
-        if (lastPickCount !== -1 && currentPickIndex > lastPickCount) {
+            // 1. Render the state as it was BEFORE the pick, but with the new player added to that team
+            // We use currentPickIndex - 1 to get the team that just picked
+            renderDraftState(data, currentPickIndex - 1, true);
+            
+            // Flash highlight the last slot of the previous team
             const filledSlots = document.querySelectorAll('.member-slot.filled');
             const lastSlot = filledSlots[filledSlots.length - 1];
             if (lastSlot) {
-                lastSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 lastSlot.classList.add('flash-highlight');
             }
+            
+            // 2. Wait 3 seconds to show the picked player in the previous team's panel
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
+        
+        // 3. Now update the UI to the CURRENT team (the one picking now)
+        renderDraftState(data, currentPickIndex);
         lastPickCount = currentPickIndex;
 
     } catch (error) {
@@ -162,5 +85,97 @@ async function updatePick() {
     }
 }
 
-setInterval(updatePick, 2000);
-updatePick();
+function renderDraftState(data, displayPickIndex, isShowingPrevious = false) {
+    // If we are showing the previous team, we use the snakeOrder for that index
+    // but the actual team data from the latest API response (which includes the new player)
+    const teamIndexToDisplay = data.draft.snakeOrder[displayPickIndex];
+    const team = data.draft.teams[teamIndexToDisplay];
+    const teamColor = ACCENT_COLORS[teamIndexToDisplay % ACCENT_COLORS.length];
+
+    // Update Captain Focus
+    const captainFocus = document.getElementById('captain-focus');
+    captainFocus.style.setProperty('--team-color', teamColor);
+    captainFocus.innerHTML = `
+        <div class="team-number">TEAM ${teamIndexToDisplay + 1} ${isShowingPrevious ? '(PICKED)' : ''}</div>
+        <img src="${team.captain.avatarUrl}" class="focus-avatar">
+        <div class="focus-name">${team.captain.username}</div>
+    `;
+
+    // Update Team Members (7 slots)
+    const teamMembers = document.getElementById('team-members');
+    let membersHTML = '';
+    for (let i = 0; i < 7; i++) {
+        const player = team.players[i];
+        if (player) {
+            membersHTML += `
+                <div class="member-slot filled">
+                    <img src="${player.avatarUrl}" class="member-avatar">
+                    <span class="member-name">${player.username}</span>
+                </div>
+            `;
+        } else {
+            membersHTML += `<div class="member-slot">${i + 1}</div>`;
+        }
+    }
+    teamMembers.innerHTML = membersHTML;
+
+    // Update Available Players
+    const availableContainer = document.getElementById('available-players');
+    const pickedUserIds = new Set(data.draft.teams.flatMap(t => t.players.map(p => parseInt(p.osuId))));
+    const captainIds = new Set(data.draft.teams.map(t => parseInt(t.captain.osuId)));
+    
+    // Filter out captains first, then take the top 112
+    const eligiblePool = qualifiedPlayers
+        .filter(player => !captainIds.has(player.userId))
+        .slice(0, 112);
+    
+    // Animate removal of picked players
+    const existingCards = Array.from(availableContainer.querySelectorAll('.available-card'));
+    existingCards.forEach(card => {
+        const userId = parseInt(card.id.replace('player-', ''));
+        if (pickedUserIds.has(userId)) {
+            card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0)';
+            setTimeout(() => card.remove(), 500);
+        }
+    });
+
+    // Add new cards if they don't exist
+    eligiblePool.forEach(player => {
+        const isPicked = pickedUserIds.has(player.userId);
+        if (!isPicked && !document.getElementById(`player-${player.userId}`)) {
+            const card = document.createElement('div');
+            card.className = 'available-card';
+            card.id = `player-${player.userId}`;
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0)';
+            card.innerHTML = `
+                <img src="${player.avatarUrl}" class="available-avatar">
+                <div class="player-info">
+                    <div class="player-name">${player.username}</div>
+                </div>
+                <div class="player-seed-badge">#${player.seed}</div>
+            `;
+            availableContainer.appendChild(card);
+            
+            // Trigger animation
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, 50);
+        }
+    });
+}
+
+// Sequential polling to prevent race conditions with the delay
+async function startPolling() {
+    while (true) {
+        await updatePick();
+        // Wait 2 seconds between polls
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+}
+
+startPolling();
