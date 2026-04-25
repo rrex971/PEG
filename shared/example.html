@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PEG Shared Background Example</title>
+    <meta charset="UTF-8" />
+    <style>
+        :root {
+            --peg-blue-dark: #5a9cb5;
+            --peg-yellow: #face68;
+            --peg-orange: #faac68;
+            --peg-coral: #fa6868;
+            --peg-blue-light: #8bbed0;
+            --peg-white: #ffffff;
+            max-width: 1920px;
+            max-height: 1080px;
+        }
+        
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        #main {
+            position: absolute;
+            width: 1920px;
+            height: 1080px;
+            background: linear-gradient(180deg, #8bbed0 0%, #8bbed0 100%);
+            overflow: hidden;
+        }
+        
+        /* Import shared background styles */
+        @import url('background.css');
+        
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--peg-blue-dark);
+            font-family: Arial, sans-serif;
+            font-size: 3rem;
+            text-align: center;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2rem;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <!-- Use the shared background component -->
+        <div id="peg-bg-scene" class="peg-background" aria-hidden="true">
+            <!-- Box 1: Dark Blue -->
+            <div class="peg-float-box peg-box-one" data-speed="0.20" data-phase="0.1" data-ay="12">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 2: Yellow (flipped) -->
+            <div class="peg-float-box peg-box-two" data-speed="0.17" data-phase="1.0" data-ay="10">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 3: Orange -->
+            <div class="peg-float-box peg-box-three" data-speed="0.23" data-phase="2.1" data-ay="13">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 4: Coral (flipped) -->
+            <div class="peg-float-box peg-box-four" data-speed="0.19" data-phase="1.6" data-ay="11">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 5: Coral -->
+            <div class="peg-float-box peg-box-five" data-speed="0.21" data-phase="2.8" data-ay="12">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 6: Light Blue (flipped) -->
+            <div class="peg-float-box peg-box-six" data-speed="0.15" data-phase="3.5" data-ay="8">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+        </div>
+        
+        <div class="content">
+            <h1>PEG Shared Background Component</h1>
+            <p>This is an example of using the shared background component.</p>
+            <p>Boxes 2, 4, and 6 are flipped along the Y-axis.</p>
+            <p>All boxes move only on the Y-axis.</p>
+        </div>
+    </div>
+    
+    <!-- Load the shared background JavaScript -->
+    <script src="background.js"></script>
+    
+    <script>
+        // The background animation will auto-initialize because 
+        // the container has id="peg-bg-scene"
+        
+        // You can also manually control it:
+        // const bg = new PEGBackground('peg-bg-scene');
+        // bg.startAnimation();
+        // bg.stopAnimation();
+        // bg.destroy();
+    </script>
+</body>
+</html>

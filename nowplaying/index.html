@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>PEG Now Playing</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="main">
+    <div id="song">
+      <span id="songicon" aria-hidden="true">♪</span>
+      <div class="song-line">
+        <span id="songartist" class="peg-text" data-text=""></span>
+      </div>
+      <div class="song-line">
+        <span id="songtitle" class="peg-text" data-text=""></span>
+      </div>
+    </div>
+  </div>
+  <script src="../deps/reconnecting-websocket.min.js"></script>
+  <script src="../deps/countUp.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

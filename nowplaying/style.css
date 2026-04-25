@@ -1,0 +1,126 @@
+:root {
+    --peg-blue-dark: #5a9cb5;
+    --peg-yellow: #face68;
+    --peg-orange: #faac68;
+    --peg-coral: #fa6868;
+    --peg-blue-light: #8bbed0;
+    --peg-white: #ffffff;
+    max-width: 1920px;
+    max-height: 1080px;
+    font-weight: 400;
+    font-variant-numeric: lining-nums;
+    -moz-font-feature-settings:"lnum" 1; 
+    -moz-font-feature-settings:"lnum=1"; 
+    -ms-font-feature-settings:"lnum" 1; 
+    -o-font-feature-settings:"lnum" 1; 
+    -webkit-font-feature-settings:"lnum" 1; 
+    font-feature-settings:"lnum" 1;
+}
+
+@font-face {
+    font-family: MoonGET;
+    src: url('moon_get-Heavy.ttf') format('truetype');
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+#main {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1920px;
+    height: 1080px;
+    background: transparent;
+    font-family: MoonGET, Arial, sans-serif;
+    color: var(--peg-white);
+    overflow: hidden;
+    font-optical-sizing: auto;
+}
+
+#song {
+    font-variant-numeric: lining-nums;
+    -moz-font-feature-settings:"lnum" 1; 
+    -moz-font-feature-settings:"lnum=1"; 
+    -ms-font-feature-settings:"lnum" 1; 
+    -o-font-feature-settings:"lnum" 1; 
+    -webkit-font-feature-settings:"lnum" 1; 
+    font-feature-settings:"lnum" 1;
+    position: absolute;
+    left: 64px;
+    bottom: 44px;
+    font-family: MoonGET, Arial, sans-serif;
+    font-size: 2rem;
+    border-radius: 20px;
+    transition: color 0.2s;
+    text-align: left;
+    width: min(400px, 48%);
+    overflow: visible;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    padding: 12px 18px 14px;
+    background-color: var(--peg-white);
+    box-shadow: 0 6px 0 rgba(255, 255, 255, 0.22);
+}
+
+#songicon {
+    color: var(--peg-blue-dark);
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.song-line {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding: 0.2em 0;
+}
+
+.peg-text {
+    position: relative;
+    display: inline-block;
+    color: var(--peg-blue-dark);
+    line-height: 1.12;
+    letter-spacing: 0.03em;
+    z-index: 1;
+    max-width: 100%;
+    white-space: nowrap;
+}
+
+/* Disable pseudo-element outline to avoid webkit text-stroke artifacts. */
+.peg-text::before {
+    content: none;
+}
+
+#songartist {
+    font-size: 1.35rem;
+}
+
+#songtitle {
+    font-size: 1.95rem;
+    color: var(--peg-yellow);
+}
+
+#songartist.overflow-animate,
+#songtitle.overflow-animate {
+    animation: song-marquee 14s linear infinite alternate;
+}
+
+@keyframes song-marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(var(--overflow-distance, 0px));
+    }
+}

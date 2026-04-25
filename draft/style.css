@@ -1,0 +1,47 @@
+body {
+    background-color: #8bbed0;
+    color: white;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+#teams-grid {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 10px;
+}
+
+.team-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.captain-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+#pick-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#top-half {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 20px;
+}
+
+#bottom-half {
+    flex: 1;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,89 @@
+/* PEG Shared Background Component */
+:root {
+    --peg-blue-dark: #5a9cb5;
+    --peg-yellow: #face68;
+    --peg-orange: #faac68;
+    --peg-coral: #fa6868;
+    --peg-blue-light: #8bbed0;
+    --peg-white: #ffffff;
+    --peg-ink: #2b4c5a;
+}
+
+.peg-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.peg-float-box {
+    position: absolute;
+    left: -320px;
+    width: 2560px;
+    will-change: transform;
+    overflow: visible;
+    background: none;
+    pointer-events: none;
+}
+
+.peg-float-box svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    pointer-events: none;
+}
+
+.peg-float-box path {
+    fill: currentColor;
+}
+
+/* Box positioning and colors */
+.peg-box-one {
+    top: -220px;
+    height: 300px;
+    color: var(--peg-blue-dark);
+    z-index: 1;
+}
+
+.peg-box-two {
+    top: -60px;
+    height: 250px;
+    color: var(--peg-yellow);
+    z-index: 2;
+}
+
+.peg-box-three {
+    top: 120px;
+    height: 230px;
+    color: var(--peg-orange);
+    z-index: 3;
+}
+
+.peg-box-four {
+    top: 300px;
+    height: 240px;
+    color: var(--peg-coral);
+    z-index: 4;
+}
+
+.peg-box-five {
+    top: 470px;
+    height: 220px;
+    color: var(--peg-coral);
+    z-index: 5;
+    opacity: 0.96;
+}
+
+.peg-box-six {
+    top: 600px;
+    height: 600px;
+    color: var(--peg-blue-light);
+    z-index: 6;
+    opacity: 1;
+}
