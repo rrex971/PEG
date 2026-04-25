@@ -129,6 +129,15 @@ function renderDraftState(data, displayPickIndex, isShowingPrevious = false) {
         .filter(player => !captainIds.has(player.userId))
         .slice(0, 112);
     
+    // Calculate optimal card width based on longest username
+    const remainingPlayers = eligiblePool.filter(p => !pickedUserIds.has(p.userId));
+    if (remainingPlayers.length > 0) {
+        const longestName = remainingPlayers.reduce((a, b) => a.username.length > b.username.length ? a : b).username;
+        // Estimate width: avatar (45px) + gap (8px) + name (approx 10px per char) + padding (24px)
+        const estimatedWidth = Math.min(300, Math.max(150, 45 + 8 + (longestName.length * 9) + 24));
+        availableContainer.style.setProperty('--card-width', `${estimatedWidth}px`);
+    }
+    
     // Animate removal of picked players
     const existingCards = Array.from(availableContainer.querySelectorAll('.available-card'));
     existingCards.forEach(card => {

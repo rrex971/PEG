@@ -39,8 +39,8 @@ async function updateOverview() {
                 </div>
             `;
 
-            // Player Cells (8 slots total)
-            for (let i = 0; i < 8; i++) {
+            // Player Cells (7 slots total)
+            for (let i = 0; i < 7; i++) {
                 const player = team.players[i];
                 if (player) {
                     rowHTML += `
