@@ -68,11 +68,14 @@ body {
     left: 0;
     display: none;
     align-items: center;
+    justify-content: flex-end;
     gap: 10px;
     color: var(--team-color);
     font-size: 1.2rem;
     font-weight: bold;
     transition: top 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 56px;
+    width: 130px;
 }
 
 .picking-indicator.visible {
@@ -90,8 +93,8 @@ body {
 .team-row {
     display: grid;
     grid-template-columns: 220px repeat(8, 1fr);
-    gap: 6px;
-    height: 48px;
+    gap: 8px;
+    height: 56px;
     align-items: center;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;

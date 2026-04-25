@@ -5,7 +5,8 @@ const ACCENT_COLORS = ['#5a9cb5', '#face68', '#faac68', '#fa6868'];
 
 async function updateOverview() {
     try {
-        const response = await fetch(`${PROXY_URL}${encodeURIComponent(API_URL)}`);
+        // Add timestamp to bypass proxy cache
+        const response = await fetch(`${PROXY_URL}${encodeURIComponent(API_URL)}?t=${Date.now()}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
