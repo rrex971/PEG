@@ -28,9 +28,6 @@ async function updateOverview() {
             row.className = 'team-row';
             if (index === currentTeamIndex) {
                 row.classList.add('picking');
-                // Position indicator
-                indicator.classList.add('visible');
-                indicator.style.top = `${index * (48 + 6)}px`; // height + gap
             }
             row.style.setProperty('--team-color', teamColor);
 

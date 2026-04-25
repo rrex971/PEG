@@ -140,17 +140,15 @@ async function updatePick() {
 
         // Flash highlight if a new pick happened
         if (lastPickCount !== -1 && currentPickIndex > lastPickCount) {
-            const lastPicked = picks[picks.length - 1];
-            
             // Wait 3 seconds before updating the UI to show the new pick
             await new Promise(resolve => setTimeout(resolve, 3000));
-
-            const filledSlots = document.querySelectorAll('.member-slot.filled');
-            const lastSlot = filledSlots[filledSlots.length - 1];
-            if (lastSlot) {
-                lastSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                lastSlot.classList.add('flash-highlight');
-            }
+        }
+        
+        const filledSlots = document.querySelectorAll('.member-slot.filled');
+        const lastSlot = filledSlots[filledSlots.length - 1];
+        if (lastSlot && lastPickCount !== -1 && currentPickIndex > lastPickCount) {
+            lastSlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            lastSlot.classList.add('flash-highlight');
         }
         lastPickCount = currentPickIndex;
 
