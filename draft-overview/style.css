@@ -28,10 +28,10 @@ body {
     transform: translate(-50%, -50%) scale(0.9);
     width: 1920px;
     height: 1080px;
-    padding: 60px 80px;
-    box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    padding: 20px 80px 60px;
+    box-sizing: border-box;
     gap: 20px;
 }
 
@@ -60,41 +60,18 @@ body {
     gap: 6px;
     flex-grow: 1;
     position: relative;
-    padding-left: 140px;
+    padding-left: 0;
 }
 
 .picking-indicator {
-    position: absolute;
-    left: 0;
     display: none;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    color: var(--team-color);
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: top 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    height: 56px;
-    width: 130px;
-}
-
-.picking-indicator.visible {
-    display: flex;
-}
-
-.picking-arrow {
-    width: 0;
-    height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-left: 15px solid var(--team-color);
 }
 
 .team-row {
     display: grid;
     grid-template-columns: 220px repeat(8, 1fr);
-    gap: 8px;
-    height: 56px;
+    gap: 6px;
+    height: 49px;
     align-items: center;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
