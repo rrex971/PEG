@@ -150,6 +150,9 @@ body {
     font-size: 2rem;
     font-weight: 700;
     white-space: nowrap;
+    max-width: 500px; /* limit width of title */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #artist {
@@ -213,7 +216,7 @@ body {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 25px;
     padding: 20px;
-    height: 100px;
+    height: 140px;
     display: flex;
     flex-direction: column;
     gap: 10px;
