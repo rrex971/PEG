@@ -85,13 +85,23 @@ socket.onmessage = event => {
         }
 
         // Update Stats
-        sr.update(beatmap.stats.stars.total);
-        bpm.update(beatmap.stats.bpm.common);
-        length.update(beatmap.stats.duration.total / 1000);
-        cs.update(beatmap.stats.cs.converted);
-        ar.update(beatmap.stats.ar.converted);
-        od.update(beatmap.stats.od.converted);
-        hp.update(beatmap.stats.hp.converted);
+        sr.update(beatmap.stats.stars?.total ?? 0);
+        bpm.update(beatmap.stats.bpm?.common ?? 0);
+        // Duration is provided under beatmap.time.mp3Length (milliseconds)
+        const lengthMs = beatmap.time?.mp3Length ?? 0;
+        length.update(lengthMs / 1000);
+        // Debug: log stats object to see available fields
+        console.log('beatmap stats:', beatmap.stats);
+        // Some beatmap data may not have the "converted" field (e.g., older osu! versions).
+        // Fallback to the raw value if "converted" is undefined.
+        const csVal = beatmap.stats.cs?.converted ?? beatmap.stats.cs ?? 0;
+        const arVal = beatmap.stats.ar?.converted ?? beatmap.stats.ar ?? 0;
+        const odVal = beatmap.stats.od?.converted ?? beatmap.stats.od ?? 0;
+        const hpVal = beatmap.stats.hp?.converted ?? beatmap.stats.hp ?? 0;
+        cs.update(csVal);
+        ar.update(arVal);
+        od.update(odVal);
+        hp.update(hpVal);
 
         // Handle Title Overflow
         title.classList.remove('overflow-animate');
