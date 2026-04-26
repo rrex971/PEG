@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="main">
+        <div id="container">
+            <div id="gameplay-container">
+                <div id="gameplay"></div>
+            </div>
+            <div id="sidebar">
+                <div id="header">
+                    <img src="../PEG_logo.png" id="logo">
+                    <div id="title-bar">POOL SHOWCASE</div>
+                    <div id="round">ROUND</div>
+                </div>
+                
+                <div id="map-card">
+                    <div id="bg-container">
+                        <div id="pick-badge">N/A</div>
+                        <img id="map-bg" />
+                    </div>
+                    
+                    <div id="map-info">
+                        <div id="title-container">
+                            <div id="title">TITLE</div>
+                        </div>
+                        <div id="artist">ARTIST</div>
+                        <div id="difficulty">DIFFICULTY</div>
+                        <div id="mapper">MAPPER</div>
+                    </div>
+
+                    <div id="stats-grid">
+                        <div class="top-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">SR</span>
+                                <span class="stat-value"><span id="sr">0.00</span>*</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">BPM</span>
+                                <span id="bpm" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">LEN</span>
+                                <span id="length" class="stat-value">0:00</span>
+                            </div>
+                        </div>
+                        <div class="bottom-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">CS</span>
+                                <span id="csval" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">AR</span>
+                                <span id="arval" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">OD</span>
+                                <span id="odval" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">HP</span>
+                                <span id="hpval" class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="casters-card">
+                    <div class="card-label">CASTERS</div>
+                    <div id="casters-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../deps/reconnecting-websocket.min.js"></script>
+    <script src="../deps/countUp.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
