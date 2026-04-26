@@ -42,7 +42,8 @@ fetch('mappool.json')
     .then(response => response.json())
     .then(data => {
         mappool = data;
-        // Extract custom entries for later title‑based matching
+        // Extract custom entries for later title‑based matching.
+        // `key` is the unique word from the title (e.g., "Anemone"), `pick` is the display text (e.g., "HD2").
         customEntries = Object.entries(data)
             .filter(([, v]) => v && typeof v === 'object' && v.custom)
             .map(([k, v]) => ({ key: k, pick: v.pick }));
@@ -73,7 +74,8 @@ socket.onmessage = event => {
             pickBadge.style.display = "block";
         } else {
             // Try custom entries: match by title containing the custom pick string
-            const customMatch = customEntries.find(entry => beatmap.title && beatmap.title.includes(entry.pick));
+            // Match custom entries by checking if the beatmap title contains the unique key word.
+            const customMatch = customEntries.find(entry => beatmap.title && beatmap.title.includes(entry.key));
             if (customMatch) {
                 pickBadge.innerHTML = customMatch.pick;
                 pickBadge.style.display = "block";
