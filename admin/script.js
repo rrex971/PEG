@@ -210,6 +210,29 @@ function showMapActionPopup(card, mapId, mapData) {
     popup.dataset.mapArtist = mapData.artist;
 }
 
+// Trigger strobe flash animation for picks
+function triggerStrobeFlash(card, player) {
+    // Remove old flash
+    card.classList.remove('strobe-flash');
+    const oldOverlay = card.querySelector('.strobe-overlay');
+    if (oldOverlay) oldOverlay.remove();
+    
+    // Create new overlay
+    const overlay = document.createElement('div');
+    overlay.className = `strobe-overlay team-${player}`;
+    card.appendChild(overlay);
+    
+    // Force reflow and add flash class
+    void card.offsetWidth;
+    card.classList.add('strobe-flash');
+    
+    // Remove after animation
+    setTimeout(() => {
+        card.classList.remove('strobe-flash');
+        overlay.remove();
+    }, 2100);
+}
+
 // Handle popup button clicks
 function handlePopupAction(action, player, beatmapId, pick, title, artist) {
     const popup = document.getElementById('map-action-popup');
@@ -238,6 +261,8 @@ function handlePopupAction(action, player, beatmapId, pick, title, artist) {
                 borderColor = '#f7c9e2';
                 flashClass = 'flash-right';
             }
+            // Trigger strobe flash for picks
+            triggerStrobeFlash(card, player);
             break;
         case 'banned':
             statusText = `Banned by ${player === 1 ? playerLeft : playerRight}`;

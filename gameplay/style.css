@@ -223,7 +223,7 @@ body {
 }
 
 .pick-tag {
-    font-size: 0.65rem;
+    font-size: 1rem;
     padding: 3px 8px;
     border-radius: 4px;
     font-weight: 600;
@@ -250,7 +250,7 @@ body {
 .pick-tag.ban {
     background: rgba(255, 107, 107, 0.2);
     color: var(--peg-coral, #ff6b6b);
-    border: 1px solid rgba(255, 107, 107, 0.4);
+    border: solid rgba(255, 107, 107, 0.4);
     text-decoration: line-through;
 }
 

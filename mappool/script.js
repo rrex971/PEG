@@ -234,6 +234,28 @@ function clearMapAction(card, pickId, beatmapId) {
     localStorage.setItem(key, JSON.stringify(picks));
 }
 
+function triggerStrobeFlash(card, player) {
+    // Remove old flash
+    card.classList.remove('strobe-flash');
+    const oldOverlay = card.querySelector('.strobe-overlay');
+    if (oldOverlay) oldOverlay.remove();
+    
+    // Create new overlay
+    const overlay = document.createElement('div');
+    overlay.className = `strobe-overlay team-${player}`;
+    card.appendChild(overlay);
+    
+    // Force reflow and add flash class
+    void card.offsetWidth;
+    card.classList.add('strobe-flash');
+    
+    // Remove after animation
+    setTimeout(() => {
+        card.classList.remove('strobe-flash');
+        overlay.remove();
+    }, 2100);
+}
+
 function applyMapAction(card, action, player, pickId, beatmapId) {
     // Get team name from localStorage
     const currentMatch = JSON.parse(localStorage.getItem('peg-current-match') || 'null');
@@ -243,6 +265,11 @@ function applyMapAction(card, action, player, pickId, beatmapId) {
     card.classList.remove('flash');
     void card.offsetWidth; // Force reflow
     card.classList.add('flash');
+    
+    // Strobe flash for picks
+    if (action === 'picked') {
+        triggerStrobeFlash(card, player);
+    }
     
     // Remove old status classes
     card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2', 'protected');
@@ -334,6 +361,88 @@ socket.onmessage = (event) => {
                     mapInfoBg.src = `/files/beatmap/${encodeURIComponent(bgPath)}`;
                 }
             }
+            
+            // Update map info panel (title, artist, difficulty, mapper, pick badge, stats)
+            const beatmap = data.beatmap;
+            
+            // Update basic map info
+            const titleEl = document.getElementById('title');
+            const artistEl = document.getElementById('artist');
+            const difficultyEl = document.getElementById('difficulty');
+            const mapperEl = document.getElementById('mapper');
+            const pickBadgeEl = document.getElementById('pick-badge');
+            
+            if (titleEl) titleEl.textContent = beatmap.title || 'Unknown Title';
+            if (artistEl) artistEl.textContent = beatmap.artist || 'Unknown Artist';
+            if (difficultyEl) difficultyEl.textContent = `[${beatmap.version || 'Unknown'}]`;
+            if (mapperEl) mapperEl.textContent = `Mapped by ${beatmap.mapper || 'Unknown'}`;
+            
+            // Update pick badge from mappool
+            if (currentMappool && beatmap.id) {
+                const mapEntry = currentMappool[beatmap.id];
+                if (mapEntry) {
+                    if (mapEntry.custom === undefined) {
+                        // Standard map entry (string value)
+                        if (pickBadgeEl) pickBadgeEl.textContent = mapEntry;
+                    } else {
+                        // Custom map entry (object with pick property)
+                        if (pickBadgeEl) pickBadgeEl.textContent = mapEntry.pick;
+                    }
+                } else {
+                    if (pickBadgeEl) pickBadgeEl.textContent = 'N/A';
+                }
+            }
+            
+            // Update stats using tourney client data (preferred for tournament mode)
+            const tourneyStats = data.tourney?.clients?.[0]?.beatmap?.stats;
+            const beatmapStats = beatmap.stats;
+            
+            // Stars
+            const starsEl = document.getElementById('sr');
+            if (starsEl) {
+                const stars = tourneyStats?.stars?.total ?? beatmapStats?.stars?.total ?? 0;
+                starsEl.textContent = stars.toFixed(2);
+            }
+            
+            // BPM
+            const bpmEl = document.getElementById('bpm');
+            if (bpmEl) {
+                const bpmVal = tourneyStats?.bpm?.common ?? beatmapStats?.bpm?.common ?? 0;
+                bpmEl.textContent = bpmVal.toFixed(0);
+            }
+            
+            // Length (always use beatmap.time.mp3Length in milliseconds)
+            const lengthEl = document.getElementById('length');
+            if (lengthEl) {
+                const lengthMs = beatmap.time?.mp3Length ?? 0;
+                const seconds = Math.floor(lengthMs / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                lengthEl.textContent = `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
+            }
+            
+            // CS, AR, OD, HP with fallbacks
+            const csEl = document.getElementById('csval');
+            const arEl = document.getElementById('arval');
+            const odEl = document.getElementById('odval');
+            const hpEl = document.getElementById('hpval');
+            
+            if (csEl) {
+                const csVal = tourneyStats?.cs?.converted ?? beatmapStats?.cs?.converted ?? 0;
+                csEl.textContent = csVal.toFixed(1);
+            }
+            if (arEl) {
+                const arVal = tourneyStats?.ar?.converted ?? beatmapStats?.ar?.converted ?? 0;
+                arEl.textContent = arVal.toFixed(1);
+            }
+            if (odEl) {
+                const odVal = tourneyStats?.od?.converted ?? beatmapStats?.od?.converted ?? 0;
+                odEl.textContent = odVal.toFixed(1);
+            }
+            if (hpEl) {
+                const hpVal = tourneyStats?.hp?.converted ?? beatmapStats?.hp?.converted ?? 0;
+                hpEl.textContent = hpVal.toFixed(1);
+            }
         }
     } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -354,7 +463,7 @@ document.addEventListener('click', function (event) {
 });
 
 // Picks/Bans Log from localStorage
-const picksQueue = document.getElementById('picks-queue');
+const picksQueue = document.getElementById('pick-log-items');
 const PICKS_STORAGE_KEY = 'peg-tournament-picks';
 let lastPicksHash = '';
 let lastPickLogCount = 0;
@@ -394,7 +503,7 @@ function updatePicksDisplay() {
             const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
             
             // Check if this is a tiebreaker
-            const isTiebreaker = (pick.pickId || '').startsWith('TB');
+            const isTiebreaker = (pick.pick || '').startsWith('TB');
             
             item.className = `pick-log-item ${actionClass} ${teamClass}`;
             if (isTiebreaker) {
@@ -439,7 +548,7 @@ function updatePicksDisplay() {
             const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
             
             // Check if this is a tiebreaker
-            const isTiebreaker = (pick.pickId || '').startsWith('TB');
+            const isTiebreaker = (pick.pick || '').startsWith('TB');
             
             item.className = `pick-log-item ${actionClass} ${teamClass}`;
             if (isTiebreaker) {

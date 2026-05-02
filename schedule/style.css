@@ -94,7 +94,7 @@ body {
     letter-spacing: 0.05em;
 }
 
-/* Schedule Container with Auto-Scroll */
+/* Schedule Container */
 .schedule-container {
     display: flex;
     flex-direction: column;
@@ -102,9 +102,22 @@ body {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
+    position: relative;
+    overflow: hidden;
     max-height: calc(100% - 100px);
+}
+
+/* Gradient fade at bottom */
+.schedule-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(to top, var(--peg-blue-light, #8BBED0), transparent);
+    pointer-events: none;
+    z-index: 5;
 }
 
 /* Matches Grid */
@@ -192,7 +205,8 @@ body {
     letter-spacing: 0.05em;
     color: var(--peg-ink);
     max-width: 280px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
 }

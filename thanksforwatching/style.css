@@ -284,56 +284,68 @@ body {
 
 /* Song Info */
 #song {
+    font-variant-numeric: lining-nums;
+    -moz-font-feature-settings:"lnum" 1;
+    -moz-font-feature-settings:"lnum=1";
+    -ms-font-feature-settings:"lnum" 1;
+    -o-font-feature-settings:"lnum" 1;
+    -webkit-font-feature-settings:"lnum" 1;
+    font-feature-settings:"lnum" 1;
     position: absolute;
-    left: 50%;
-    bottom: 50px;
-    transform: translateX(-50%);
-    font-family: MoonGET, sans-serif;
-    font-size: 1.8rem;
-    color: var(--peg-yellow);
-    text-align: center;
+    left: 64px;
+    bottom: 44px;
+    font-family: MoonGET, Arial, sans-serif;
+    font-size: 2rem;
+    border-radius: 20px;
+    transition: color 0.2s;
+    text-align: left;
+    width: min(400px, 48%);
+    overflow: visible;
     z-index: 4;
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 0px;
+    padding: 12px 18px 14px;
+    background-color: var(--peg-white);
+    box-shadow: 0 6px 0 rgba(255, 255, 255, 0.22);
 }
 
 #songicon {
-    color: var(--peg-yellow);
-    font-size: 2.5rem;
+    color: var(--peg-blue-dark);
+    font-size: 3rem;
     line-height: 1;
+    margin-bottom: 2px;
 }
 
 .song-line {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding: 0.2em 0;
 }
 
 .peg-text {
     position: relative;
     display: inline-block;
-    color: var(--peg-yellow);
-    line-height: 1.2;
+    color: var(--peg-blue-dark);
+    line-height: 1.12;
     letter-spacing: 0.03em;
     z-index: 1;
     max-width: 100%;
     white-space: nowrap;
 }
 
-/* Disable pseudo-element outline to avoid webkit text-stroke artifacts. */
 .peg-text::before {
     content: none;
 }
 
 #songartist {
-    font-size: 1.3rem;
-    opacity: 0.9;
+    font-size: 1.35rem;
 }
 
 #songtitle {
-    font-size: 1.6rem;
-    font-weight: 600;
+    font-size: 1.95rem;
+    color: var(--peg-yellow);
 }
 
 #songartist.overflow-animate,
