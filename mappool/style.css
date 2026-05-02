@@ -645,7 +645,7 @@ body {
 .twitch-message {
     display: flex;
     gap: 6px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     padding: 2px 0;
 }
 
@@ -749,6 +749,20 @@ body {
 #chat-messages::-webkit-scrollbar-thumb {
     background: var(--peg-blue-dark);
     border-radius: 2px;
+}
+
+/* Hide scrollbar for chat containers */
+#twitch-messages,
+#ingame-chat-messages,
+#chat-messages {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+#twitch-messages::-webkit-scrollbar,
+#ingame-chat-messages::-webkit-scrollbar,
+#chat-messages::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
 
 /* Transitions */
