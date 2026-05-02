@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>PEG Mappool Overlay</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="main">
+        <!-- Shared animated background -->
+        <div id="peg-bg-scene" class="peg-background" aria-hidden="true">
+            <!-- Box 1: Dark Blue -->
+            <div class="peg-float-box peg-box-one" data-speed="0.20" data-phase="0.1" data-ay="12">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 2: Yellow (flipped) -->
+            <div class="peg-float-box peg-box-two" data-speed="0.17" data-phase="1.0" data-ay="10">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 3: Orange -->
+            <div class="peg-float-box peg-box-three" data-speed="0.23" data-phase="2.1" data-ay="13">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 4: Coral (flipped) -->
+            <div class="peg-float-box peg-box-four" data-speed="0.19" data-phase="1.6" data-ay="11">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 5: Coral -->
+            <div class="peg-float-box peg-box-five" data-speed="0.21" data-phase="2.8" data-ay="12">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+            <!-- Box 6: Light Blue (flipped) -->
+            <div class="peg-float-box peg-box-six" data-speed="0.15" data-phase="3.5" data-ay="8">
+                <svg viewBox="0 0 617.33331 478.064">
+                    <path d="m 0,0 v 0 c 0,7.866 -6.377,14.242 -14.242,14.242 h -133.86 c -7.866,0 -14.242,-6.376 -14.242,-14.242 0,-7.866 -6.377,-14.242 -14.242,-14.242 h -27.351 c -7.865,0 -14.242,-6.377 -14.242,-14.242 v -301.579 c 0,-7.867 6.377,-14.243 14.242,-14.243 h 434.516 c 7.866,0 14.242,6.376 14.242,14.243 v 301.579 c 0,7.865 -6.376,14.242 -14.242,14.242 H 14.241 C 6.376,-14.242 0,-7.866 0,0"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header id="header">
+            <img src="../PEG_logo.png" id="logo" alt="PEG Logo">
+            <div id="round">ROUND OF 16</div>
+        </header>
+
+        <!-- Maps container -->
+        <div id="maps"></div>
+
+        <!-- Pick/Ban Log (thin horizontal line at bottom) -->
+        <div id="pick-log">
+            <div id="pick-log-items"></div>
+        </div>
+
+        <!-- Bottom Panel (resized to ~135px) -->
+        <div id="bottom-panel">
+            <!-- Map Info Panel (38%) -->
+            <div id="map-info-panel">
+                <img id="map-info-bg" class="map-info-bg" src="" alt="" />
+                <div id="map-info-content">
+                    <div id="pick-badge">N/A</div>
+                    <div id="map-info-text">
+                        <div id="title-container">
+                            <div id="title">TITLE</div>
+                        </div>
+                        <div id="artist">ARTIST</div>
+                        <div id="difficulty">DIFFICULTY</div>
+                        <div id="mapper">MAPPER</div>
+                    </div>
+                    <div id="stats-section">
+                        <!-- Star Rating (left side, prominent) -->
+                        <div id="sr-block">
+                            <svg class="sr-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            <span id="sr" class="sr-value">0.00</span>
+                        </div>
+                        
+                        <!-- 3x2 Grid of other stats (right side) -->
+                        <div id="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">BPM</span>
+                                <span id="bpm" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">LEN</span>
+                                <span id="length" class="stat-value">0:00</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">CS</span>
+                                <span id="csval" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">AR</span>
+                                <span id="arval" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">OD</span>
+                                <span id="odval" class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">HP</span>
+                                <span id="hpval" class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Casters Panel (15%) -->
+            <div id="casters-box">
+                <div class="panel-label">CASTERS</div>
+                <div id="casters-list"></div>
+            </div>
+
+            <!-- Ingame Chat (23.5%) -->
+            <div id="ingame-chat">
+                <div class="panel-label">INGAME CHAT</div>
+                <div id="chat-messages"></div>
+            </div>
+
+            <!-- Twitch Chat (23.5%) -->
+            <div id="twitch-chat">
+                <div class="panel-label">TWITCH CHAT</div>
+                <div id="twitch-messages"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../deps/reconnecting-websocket.min.js"></script>
+    <script src="../deps/tmi.min.js"></script>
+    <script src="../shared/background.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

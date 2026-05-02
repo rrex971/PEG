@@ -37,7 +37,7 @@ body {
     transform: translate(-50%, -50%);
     width: 1920px;
     height: 1080px;
-    background: linear-gradient(180deg, #8bbed0 0%, #8bbed0 100%);
+    background: linear-gradient(180deg, #8BBED0 0%, #8BBED0 100%);
     font-family: MoonGET, Arial, sans-serif;
     color: var(--peg-white);
     overflow: hidden;

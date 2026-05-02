@@ -1,0 +1,271 @@
+/* Schedule Screen Styles */
+
+:root {
+    --peg-blue-dark: #5a9cb5;
+    --peg-yellow: #face68;
+    --peg-orange: #faac68;
+    --peg-coral: #fa6868;
+    --peg-blue-light: #8bbed0;
+    --peg-white: #ffffff;
+    --peg-ink: #2b4c5a;
+}
+
+@font-face {
+    font-family: MoonGET;
+    src: url('../nowplaying/moon_get-Heavy.ttf') format('truetype');
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    font-family: 'Lexend', sans-serif;
+    background-color: #8BBED0;
+}
+
+#main {
+    position: absolute;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+}
+
+/* Header (compact) */
+#header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    background: rgba(43, 76, 90, 0.9);
+    z-index: 10;
+}
+
+#logo {
+    height: 40px;
+    width: auto;
+}
+
+#round {
+    font-family: MoonGET;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: var(--peg-white);
+}
+
+/* Schedule Content */
+.schedule-content {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 50px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 50px;
+    box-sizing: border-box;
+}
+
+/* Schedule Content */
+.schedule-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.round-title {
+    font-family: 'MoonGET', sans-serif;
+    font-size: 1.8rem;
+    color: var(--peg-ink);
+    margin-bottom: 25px;
+    letter-spacing: 0.05em;
+}
+
+/* Schedule Container with Auto-Scroll */
+.schedule-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    max-height: calc(100% - 100px);
+}
+
+/* Matches Grid */
+.matches-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Match Card */
+.match-card {
+    background: white;
+    border-radius: 12px;
+    padding: 28px 32px;
+    min-height: 100px;
+    border-bottom: 3px solid var(--peg-yellow);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+}
+
+/* Match Status Styling */
+.match-card.upcoming {
+    border-bottom: 4px solid var(--peg-blue-dark);
+}
+
+.match-card.ongoing {
+    border-bottom: 4px solid var(--peg-yellow);
+    background: rgba(250, 206, 104, 0.1);
+}
+
+.match-card.finished {
+    border-bottom: 4px solid rgba(255, 255, 255, 0.2);
+    opacity: 0.7;
+}
+
+/* Match Time - Top Row */
+.match-time-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.match-time {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--peg-ink);
+}
+
+.countdown {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--peg-blue-dark);
+    opacity: 0.8;
+}
+
+/* Team Names */
+.teams {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.team-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: fill;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.team-name {
+    font-family: 'MoonGET', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+    color: var(--peg-ink);
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vs-text {
+    font-size: 0.65rem;
+    color: var(--peg-ink);
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 15px;
+}
+
+/* Team Names Styling */
+.team-name {
+    font-family: 'MoonGET', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+    color: var(--peg-ink);
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vs-text {
+    font-size: 0.75rem;
+    color: var(--peg-ink);
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 10px;
+}
+
+/* Match Score */
+.match-score {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 20px;
+}
+
+.match-score .score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--peg-ink);
+}
+
+.match-score .score-separator {
+    font-size: 1.2rem;
+    color: var(--peg-ink);
+    opacity: 0.5;
+}
+
+.match-score .team1 {
+    color: var(--peg-blue-dark);
+}
+
+.match-score .team2 {
+    color: var(--peg-coral);
+}
+
+/* Error Message */
+.error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 1.5rem;
+    color: var(--peg-coral);
+    font-weight: 600;
+    text-align: center;
+    padding: 20px;
+}

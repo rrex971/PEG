@@ -1,0 +1,11 @@
+{
+    "bestOf": 9,
+    "maxBans": 2,
+    "maxProtects": 0,
+    "maxPoints": 4,
+    "team1Index": 0,
+    "team2Index": 1,
+    "maxPicks": 5,
+    "pickTimer": 30,
+    "banTimer": 30
+}

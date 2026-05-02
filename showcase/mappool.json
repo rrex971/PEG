@@ -3,26 +3,16 @@
     "3130258": "DT3",
     "3180049": "NM2",
     "4130938": "HD1",
+    "4450792": { "pick": "HD2", "custom": true },
     "4653719": "FM1",
     "4761556": "NM5",
     "4768873": "DT1",
     "4819704": "NM3",
-    "4834006": "NM1",
     "5059931": "NM4",
     "5086678": "DT2",
     "5206842": "HR2",
     "5465990": "TB",
-
-    "Countdown": {
-        "pick": "HD2",
-        "custom": true
-    },
-    "Cubibibism": {
-        "pick": "HR1",
-        "custom": true
-    },
-    "Ciki": {
-        "pick": "FM2",
-        "custom": true
-    }
+    "5536758": "NM1",
+    "5636563": { "pick": "FM2", "custom": true },
+    "5636564": { "pick": "HR1", "custom": true }
 }

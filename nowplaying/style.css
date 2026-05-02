@@ -37,7 +37,7 @@ body {
     width: auto;
     height: auto;
     background: transparent;
-    font-family: MoonGET, Arial, sans-serif;
+    font-family: MoonGET, sans-serif;
     color: var(--peg-white);
     overflow: visible;
     font-optical-sizing: auto;
@@ -45,14 +45,14 @@ body {
 
 #song {
     font-variant-numeric: lining-nums;
-    -moz-font-feature-settings:"lnum" 1; 
-    -moz-font-feature-settings:"lnum=1"; 
-    -ms-font-feature-settings:"lnum" 1; 
-    -o-font-feature-settings:"lnum" 1; 
-    -webkit-font-feature-settings:"lnum" 1; 
+    -moz-font-feature-settings:"lnum" 1;
+    -moz-font-feature-settings:"lnum=1";
+    -ms-font-feature-settings:"lnum" 1;
+    -o-font-feature-settings:"lnum" 1;
+    -webkit-font-feature-settings:"lnum" 1;
     font-feature-settings:"lnum" 1;
     position: static;
-    font-family: MoonGET, Arial, sans-serif;
+    font-family: MoonGET, sans-serif;
     font-size: 2rem;
     border-radius: 20px;
     transition: color 0.2s;
