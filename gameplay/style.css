@@ -1,0 +1,1098 @@
+@import url('../shared/background.css');
+
+/* PEG Gameplay Overlay Styles - Horizontal Layout with Progressive Scorebar */
+
+/* Picks rows with labels */
+.picks-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#team-left-side .picks-row {
+    justify-content: flex-start;
+}
+
+#team-right-side .picks-row {
+    justify-content: flex-end;
+}
+
+.picks-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    min-width: 30px;
+}
+
+.picks-slots {
+    display: flex;
+    gap: 4px;
+}
+
+:root {
+    --peg-blue-dark: #5a9cb5;
+    --peg-yellow: #face68;
+    --peg-orange: #faac68;
+    --peg-coral: #fa6868;
+    --peg-blue-light: #8bbed0;
+    --peg-white: #ffffff;
+    --peg-ink: #2b4c5a;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+}
+
+@font-face {
+    font-family: MoonGET;
+    src: url('../nowplaying/moon_get-Heavy.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #8BBED0;
+    font-family: 'Lexend', sans-serif;
+    color: var(--peg-white);
+}
+
+#main {
+    position: absolute;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+}
+
+/* Blurred Background for Gameplay Area */
+#gameplay-bg {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 1920px;
+    height: 615px;
+    filter: blur(20px);
+    transform: scale(1.1);
+    z-index: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Header (compact) */
+#header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    background: rgba(43, 76, 90, 0.9);
+    z-index: 10;
+}
+
+#logo {
+    height: 40px;
+    width: auto;
+}
+
+#round {
+    font-family: MoonGET;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: var(--peg-white);
+    letter-spacing: 0.1em;
+}
+
+/* Gameplay Area (full width, edge-to-edge) */
+#gameplay-area {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 1920px;
+    height: 615px;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#gameplay {
+    width: 100%;
+    height: 100%;
+}
+
+/* Team Info + Player Slots + Score Bar Area */
+#team-score-area {
+    position: absolute;
+    top: 665px;
+    left: 0;
+    width: 100%;
+    height: 280px;
+    background: var(--peg-ink);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Points Center - Absolutely Centered */
+#points-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 5;
+}
+
+/* Team Blocks Container - At bottom, aligned to edges */
+#team-blocks-container {
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 30px;
+}
+
+.team-side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#team-left-side {
+    align-items: flex-start;
+}
+
+#team-left-side .team-header {
+    justify-content: flex-start;
+}
+
+#team-right-side {
+    align-items: flex-end;
+}
+
+#team-right-side .team-header {
+    justify-content: flex-end;
+}
+
+.team-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    width: 100%;
+}
+
+.team-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#team-left-side .team-info {
+    align-items: flex-start;
+}
+
+#team-right-side .team-info {
+    align-items: flex-end;
+}
+
+.team-picks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px; /* breathing room between team name and bans */
+}
+
+#team-left-side .team-picks {
+    justify-content: flex-start;
+}
+
+#team-right-side .team-picks {
+    justify-content: flex-end;
+}
+
+.pick-tag {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+/* Team left picks — yellow */
+.pick-tag.pick.team-left {
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--peg-yellow, #ffd700);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+}
+
+/* Team right picks — red/coral */
+.pick-tag.pick.team-right {
+    background: rgba(255, 107, 107, 0.2);
+    color: var(--peg-coral, #ff6b6b);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+}
+
+/* Bans — coral red with line-through */
+.pick-tag.ban {
+    background: rgba(255, 107, 107, 0.2);
+    color: var(--peg-coral, #ff6b6b);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    text-decoration: line-through;
+}
+
+/* Protects — green */
+.pick-tag.protect {
+    background: rgba(80, 200, 120, 0.2);
+    color: #50c878;
+    border: 1px solid rgba(80, 200, 120, 0.4);
+}
+
+/* Empty slots for bans/protects */
+.pick-tag.empty {
+    opacity: 0.3;
+    border-style: dashed;
+}
+
+#team-left-side .team-header {
+    justify-content: flex-start;
+}
+
+#team-right-side .team-header {
+    justify-content: flex-end;
+}
+
+.team-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: fill;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.team-name {
+    font-family: MoonGET;
+    font-size: 1.4rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-align: center;
+    max-width: 32ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#team-left-name {
+    color: var(--peg-yellow);
+}
+
+#team-right-name {
+    color: var(--peg-coral);
+}
+
+
+/* Player Slots */
+.player-slots {
+    display: flex;
+    gap: 6px;
+}
+
+/* Players Row - flex container for player slots and overflow indicator */
+.players-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.player-slot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 4px;
+    border-radius: 20px;
+    background: var(--peg-white);
+    transition: all 0.3s ease;
+    will-change: transform;
+}
+
+/* Active state: filled white with team-colored text */
+.player-slot.active {
+    background: var(--peg-white);
+}
+
+.player-slot.active .player-name {
+    color: var(--peg-ink);
+    opacity: 1;
+}
+
+.player-slot.active .player-avatar {
+    border-color: var(--peg-yellow);
+}
+
+#team-right-side .player-slot.active .player-avatar {
+    border-color: var(--peg-coral);
+}
+
+/* Inactive state: outline gray with gray text */
+.player-slot:not(.active) {
+    background: transparent;
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+
+.player-slot:not(.active) .player-name {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.player-slot:not(.active) .player-avatar {
+    opacity: 0.4;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.player-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.player-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--peg-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+}
+
+/* Benched Label */
+.benched-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0px;
+}
+
+/* Overflow indicator for benched players */
+.overflow-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--peg-white);
+    flex-shrink: 0;
+}
+
+/* Hide active players from benched area */
+.player-slot.in-lobby {
+    display: none;
+}
+
+/* Hide slots beyond the 4th visible benched player */
+.player-slot.overflow-hidden {
+    display: none !important;
+}
+
+/* Score Bar */
+#score-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 0 20px;
+    flex-shrink: 0;
+}
+
+#score-bar-track {
+    width: 100%;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+#score-bar-left {
+    position: absolute;
+    top: 0;
+    right: 50%;
+    height: 100%;
+    width: 0%;
+    background: var(--peg-yellow);
+    border-radius: 8px 0 0 8px;
+    transition: width 0.3s ease;
+}
+
+#score-bar-right {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 100%;
+    width: 0%;
+    background: var(--peg-coral);
+    border-radius: 0 8px 8px 0;
+    transition: width 0.3s ease;
+}
+
+/* Live Scores at Opposite Ends */
+#live-scores {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 30px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+#score-left {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--peg-yellow);
+    text-align: left;
+    min-width: 150px;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.3s ease;
+}
+
+#score-left.leading {
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px currentColor;
+}
+
+#score-diff {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+}
+
+#score-right {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--peg-coral);
+    text-align: right;
+    min-width: 150px;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.3s ease;
+}
+
+#score-right.leading {
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px currentColor;
+}
+
+.points-number {
+    font-family: MoonGET, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--peg-white);
+}
+
+.points {
+    display: flex;
+    gap: 5px;
+}
+
+.match-point {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.match-point.filled {
+    background: var(--peg-yellow);
+    border-color: var(--peg-yellow);
+}
+
+#points-right-dots .match-point.filled {
+    background: var(--peg-coral);
+    border-color: var(--peg-coral);
+}
+
+/* Gradient Pill */
+#vs-pill {
+    width: 60px;
+    height: 15px;
+    border-radius: 10px;
+    border: 2px solid var(--peg-white);
+    background: linear-gradient(to right, #face68 0%, #fa6868 100%);
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+}
+
+/* Team Blocks */
+.team-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 200px;
+}
+
+.team-block-left {
+    align-items: flex-start;
+}
+
+.team-block-right {
+    align-items: flex-end;
+}
+
+
+.team-bans, .team-protects {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.ban-badge {
+    background: var(--peg-coral);
+    color: var(--peg-white);
+    padding: 2px 8px;
+    height: 300px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 700;
+}
+
+.protect-badge {
+    background: #64ff74;
+    color: var(--peg-ink);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-family: 'Lexend', sans-serif;
+    font-weight: 700;
+}
+
+/* Pick/Ban Log - Match Mappool Style */
+#pick-log {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1a3a47;
+    color: var(--peg-white);
+    min-height: 35px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+#pick-log-items {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    padding: 6px 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Left fade mask when content overflows */
+#pick-log-items::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, var(--peg-ink, #1a3a47), transparent);
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#pick-log-items.has-overflow::before {
+    opacity: 1;
+}
+
+.pick-log-item {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--peg-ink);
+    color: var(--peg-yellow);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: fit-content;
+    border: 2px solid var(--peg-yellow);
+    animation: logSlideIn 0.3s ease-out;
+}
+
+.pick-log-item.pick.team-left {
+    border-color: var(--peg-yellow);
+    color: var(--peg-yellow);
+}
+
+.pick-log-item.pick.team-right {
+    border-color: var(--peg-coral);
+    color: var(--peg-coral);
+}
+
+.pick-log-item.ban.team-left {
+    background-color: rgba(122, 83, 83, 0.8);
+    color: var(--peg-yellow);
+    text-decoration: line-through;
+    border-color: var(--peg-yellow);
+}
+
+.pick-log-item.ban.team-right {
+    background-color: rgba(122, 83, 83, 0.8);
+    color: var(--peg-coral);
+    text-decoration: line-through;
+    border-color: var(--peg-coral);
+}
+
+.pick-log-item.protect.team-left {
+    background-color: rgba(83, 122, 83, 0.8);
+    color: var(--peg-yellow);
+    border-color: var(--peg-yellow);
+}
+
+.pick-log-item.protect.team-right {
+    background-color: rgba(83, 122, 83, 0.8);
+    color: var(--peg-coral);
+    border-color: var(--peg-coral);
+}
+
+.pick-log-item.tiebreaker {
+    background: linear-gradient(135deg, var(--peg-yellow, #ffd700), var(--peg-coral, #ff6b6b));
+    color: white;
+    border: none;
+}
+
+.pick-log-item.tiebreaker .log-action {
+    color: white;
+}
+
+.pick-log-item.tb {
+    background-color: var(--mod-tb);
+    color: var(--peg-white);
+    font-weight: bold;
+    border-color: var(--mod-tb);
+}
+
+.pick-log-item.new {
+    animation: slideInLeft 0.2s var(--ease-expo-out);
+}
+
+.pick-log-item:last-child {
+    animation: logSlideIn 0.3s ease-out;
+}
+
+.pick-log-item {
+    /* No animation by default — only last-child animates */
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes logSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.pick-log-item.shift {
+    animation: shiftRight 0.4s var(--ease-expo-out);
+}
+
+@keyframes shiftRight {
+    from {
+        transform: translateX(-20px);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Bottom Panel (resized to ~135px) */
+#bottom-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 135px;
+    display: flex;
+    z-index: 10;
+}
+
+/* Map Info Panel (38%) */
+#map-info-panel {
+    position: relative;
+    width: 38%;
+    height: 100%;
+    background: var(--peg-white);
+    color: var(--peg-ink);
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.map-info-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.15;
+    z-index: 0;
+}
+
+#map-info-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+#pick-badge {
+    background: var(--peg-yellow);
+    color: var(--peg-ink);
+    padding: 8px 15px;
+    border-radius: 12px;
+    font-family: MoonGET;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+#map-info-text {
+    flex: 1;
+    min-width: 0;
+}
+
+#title-container {
+    overflow: hidden;
+    width: 100%;
+}
+
+#title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#title.overflow-animate {
+    animation: slide 10s linear infinite;
+}
+
+@keyframes slide {
+    0% { transform: translateX(0); }
+    30% { transform: translateX(0); }
+    80% { opacity: 1;}
+    90% { transform: translateX(-100%);}
+    95% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    96% { transform: translateX(0); opacity: 0;}
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+#artist {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+#difficulty {
+    font-size: 0.95rem;
+    color: var(--peg-blue-dark);
+    font-weight: 700;
+}
+
+#mapper {
+    font-size: 0.85rem;
+    opacity: 0.6;
+}
+
+/* Stats Section */
+#stats-section {
+    display: flex;
+    gap: 50px;
+    align-items: stretch;
+    background: rgba(139, 190, 208, 0.15);
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-left: 12px;
+}
+
+/* Star Rating Block (left) */
+#sr-block {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* NO background, NO border, NO padding box */
+}
+
+.sr-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--peg-blue-dark);
+    flex-shrink: 0;
+}
+
+.sr-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--peg-ink);
+    font-variant-numeric: tabular-nums;
+}
+
+/* 3x2 Stats Grid (right) */
+#stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 6px 16px;
+    flex: 1;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--peg-blue-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Casters Panel (15%) */
+#casters-box {
+    width: 15%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Ingame Chat (23.5%) */
+#ingame-chat {
+    width: 23.5%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Twitch Chat (23.5%) */
+#twitch-chat {
+    width: 23.5%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Twitch Chat Messages */
+.twitch-message {
+    display: flex;
+    gap: 6px;
+    font-size: 0.8rem;
+    padding: 2px 0;
+}
+
+.twitch-name {
+    font-weight: 700;
+    color: var(--peg-yellow);
+    flex-shrink: 0;
+}
+
+.twitch-text {
+    color: var(--peg-white);
+    word-break: break-word;
+}
+
+.panel-label {
+    font-family: MoonGET;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Casters List */
+#casters-list {
+    font-size: 1.1rem;
+    font-weight: 700;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Chat Messages */
+#chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-right: 5px;
+}
+
+.chat-message {
+    display: flex;
+    gap: 6px;
+    font-size: 0.85rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-name {
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.chat-name.left {
+    color: var(--peg-coral);
+}
+
+.chat-name.right {
+    color: var(--peg-blue-dark);
+}
+
+.chat-name.bot {
+    color: var(--peg-yellow);
+}
+
+.chat-name.unknown {
+    color: var(--peg-yellow);
+}
+
+.chat-text {
+    color: var(--peg-white);
+    word-break: break-word;
+}
+
+/* Twitch Placeholder */
+#twitch-placeholder {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    opacity: 0.6;
+}
+
+/* Scrollbar styling */
+#chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background: var(--peg-blue-dark);
+    border-radius: 2px;
+}
+
+/* Transitions */
+#map-bg {
+    transition: opacity 0.4s ease;
+}
+
+#map-bg.fade-out {
+    opacity: 0;
+}
+
+/* Compact spacing */
+#map-info-panel,
+#casters-box,
+#ingame-chat,
+#twitch-chat {
+    box-sizing: border-box;
+}
+
+/* Tabular numbers for all number elements */
+.team-score,
+.stat-value,
+#score-diff,
+.match-point,
+.points-number {
+    font-variant-numeric: tabular-nums;
+    -moz-font-feature-settings: "tnum";
+    -webkit-font-feature-settings: "tnum";
+    font-feature-settings: "tnum";
+}

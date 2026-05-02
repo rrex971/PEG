@@ -1,0 +1,321 @@
+:root {
+    --peg-blue-dark: #5a9cb5;
+    --peg-yellow: #face68;
+    --peg-orange: #faac68;
+    --peg-coral: #fa6868;
+    --peg-blue-light: #8bbed0;
+    --peg-white: #ffffff;
+    --peg-ink: #2b4c5a;
+}
+
+@font-face {
+    font-family: MoonGET;
+    src: url('../nowplaying/moon_get-Heavy.ttf') format('truetype');
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lexend', sans-serif;
+    background: var(--peg-blue-light, #8BBED0);
+    color: var(--peg-ink, #2b4c5a);
+    min-height: 100vh;
+    max-width: 100vw;
+}
+
+/* Header */
+header {
+    background: var(--peg-ink);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 2px solid rgba(43, 76, 90, 0.2);
+}
+
+.header-logo {
+    height: 36px;
+    width: auto;
+}
+
+header h1 {
+    font-family: 'MoonGET', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.1em;
+    color: var(--peg-white);
+}
+
+/* Cards */
+.card {
+    background: transparent;
+    padding: 20px 24px;
+    border: none;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+    font-family: 'MoonGET', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: var(--peg-ink, #2b4c5a);
+    margin-bottom: 12px;
+}
+
+/* Form elements */
+select, input {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border: 2px solid rgba(43, 76, 90, 0.2);
+    border-radius: 8px;
+    background: white;
+    color: var(--peg-ink, #2b4c5a);
+}
+
+select:focus, input:focus {
+    outline: none;
+    border-color: var(--peg-blue-dark, #5a9cb5);
+    box-shadow: 0 0 0 3px rgba(90, 156, 181, 0.1);
+}
+
+/* Buttons */
+button {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+    color: var(--peg-ink, #2b4c5a);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+    transition: all 0.1s;
+    position: relative;
+    top: 0;
+}
+
+button:hover {
+    top: 1px;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    top: 3px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+button.primary, button.set-match {
+    background: var(--peg-yellow, #face68);
+    color: var(--peg-ink, #2b4c5a);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+button.primary:hover {
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+button.danger, button.clear {
+    background: var(--peg-coral, #fa6868);
+    color: white;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+button.danger:hover {
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Team Display */
+.team-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+}
+
+.team-display .team-left,
+.team-display .team-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.team-display .team-label {
+    font-size: 0.8rem;
+    color: rgba(43, 76, 90, 0.6);
+}
+
+.team-display .team-name {
+    font-family: 'MoonGET', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    color: var(--peg-ink, #2b4c5a);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.team-display .team-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: fill;
+    border-radius: 8px;
+}
+
+.team-display .vs-text {
+    font-family: 'MoonGET', sans-serif;
+    font-size: 0.9rem;
+    color: rgba(43, 76, 90, 0.5);
+}
+
+/* Mappool Grid */
+.mappool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 50px;
+}
+
+.mappool-grid .map-card {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+}
+
+.map-card {
+    background: white;
+    border-bottom: 2px solid rgba(43, 76, 90, 0.15);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+}
+
+.map-pick {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.map-card:hover {
+    border-color: var(--peg-blue-dark, #5a9cb5);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Popup */
+.map-action-popup {
+    position: fixed;
+    z-index: 1000;
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    padding: 12px;
+}
+
+.popup-title {
+    font-family: 'MoonGET', sans-serif;
+    color: var(--peg-ink, #2b4c5a);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.popup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.popup-btn {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.popup-btn:hover {
+    filter: brightness(0.95);
+}
+
+.popup-btn.pick {
+    background: var(--peg-yellow, #face68);
+    color: var(--peg-ink, #2b4c5a);
+}
+
+.popup-btn.ban {
+    background: var(--peg-coral, #fa6868);
+    color: white;
+}
+
+.popup-btn.protect {
+    background: #50c878;
+    color: white;
+}
+
+.popup-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    padding: 0px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--peg-ink, #2b4c5a);
+    transition: opacity 0.2s;
+    opacity: 0;
+}
+
+
+
+/* Log */
+.log-content {
+    background: rgba(43, 76, 90, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(43, 76, 90, 0.3);
+    border-radius: 3px;
+}
+
+/* Map card status classes */
+.map-card.picked-by-1 {
+    border-color: var(--peg-yellow, #face68) !important;
+    background: rgba(255, 215, 0, 0.15);
+}
+
+.map-card.picked-by-2 {
+    border-color: var(--peg-coral, #fa6868) !important;
+    background: rgba(255, 107, 107, 0.15);
+}
+
+.map-card.banned {
+    border-color: var(--peg-coral, #fa6868);
+    background: rgba(255, 107, 107, 0.15);
+    opacity: 0.6;
+}
+
+.map-card.protected {
+    border-color: #50c878;
+    background: rgba(80, 200, 120, 0.15);
+}

@@ -5,7 +5,7 @@
   <title>PEG Thanks For Watching</title>
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="style.css">
-  <script src="https://apis.google.com/js/api.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -63,18 +63,18 @@
       </div>
     </div>
 
-    <img id="peg-text" src="text.png" alt="Thanks For Watching Text">
-
     <img id="peg-logo" src="../PEG_logo.png" alt="PEG logo">
 
-    <div id="matches">
-      <span id="nm">Upcoming Matches</span>
-      <div id="nextmatch" style="display: none;">
-      </div>
-      <div id="tbd-match">
-          TBD
+    <div id="content">
+      <img id="thanks-text" src="text.png" alt="Thanks for Watching Text">
+
+      <div id="matches">
+        <div id="nm">Upcoming Match</div>
+        <div id="nextmatch">
+        </div>
       </div>
     </div>
+
 
     <div id="song">
       <span id="songicon" aria-hidden="true">♪</span>
@@ -87,7 +87,7 @@
     </div>
   </div>
   <script src="../deps/reconnecting-websocket.min.js"></script>
-  <script src="../deps/countUp.js"></script>
+  <script src="../shared/sheets.js"></script>
   <script src="script.js"></script>
 </body>
 

@@ -1,7 +1,12 @@
+@font-face {
+    font-family: MoonGET;
+    src: url('../nowplaying/moon_get-Heavy.ttf') format('truetype');
+}
+
 body {
     background-color: #8bbed0;
     color: white;
-    font-family: sans-serif;
+    font-family: 'Lexend', sans-serif;
     margin: 0;
     padding: 20px;
 }

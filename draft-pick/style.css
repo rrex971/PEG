@@ -17,7 +17,7 @@ body {
     margin: 0;
     overflow: hidden;
     background-color: var(--peg-blue-light);
-    font-family: MoonGET, Arial, sans-serif;
+    font-family: MoonGET, sans-serif;
     color: var(--peg-white);
 }
 
