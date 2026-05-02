@@ -356,6 +356,7 @@ function updateTeamLogo(side, team) {
 // Update active player highlighting
 function updateActivePlayers() {
     const spectatedPlayers = state.activePlayers.map(p => p.toLowerCase());
+    console.log('[Gameplay] Spectated players:', spectatedPlayers);
 
     // Process left team
     processBenchedPlayers(els.playersLeft, els.overflowLeft, spectatedPlayers);
@@ -366,59 +367,33 @@ function updateActivePlayers() {
 
 function processBenchedPlayers(container, overflowEl, spectatedPlayers) {
     const slots = container.querySelectorAll('.player-slot');
+    console.log('[Gameplay] Container slots:', slots.length);
     
-    // If no players are spectated, show first 4 benched players, hide rest
-    if (spectatedPlayers.length === 0) {
-        let visibleCount = 0;
-        slots.forEach(slot => {
-            if (slot.dataset.playerName) {
-                if (visibleCount < 4) {
-                    slot.classList.remove('in-lobby', 'overflow-hidden');
-                    slot.style.display = '';
-                    visibleCount++;
-                } else {
-                    slot.classList.add('overflow-hidden');
-                    slot.style.display = '';
-                }
-            } else {
-                slot.style.display = 'none';
-            }
-        });
-        // Show overflow indicator if there are more than 4 benched players
-        const benchedCount = Array.from(slots).filter(s => s.dataset.playerName).length;
-        if (benchedCount > 4) {
-            overflowEl.textContent = `+${benchedCount - 4}`;
-            overflowEl.style.display = 'inline-flex';
-        } else {
-            overflowEl.style.display = 'none';
-        }
-        return;
-    }
+    let totalPlayers = 0;
+    let activeCount = 0;
     
-    let benchedCount = 0;
-    let visibleCount = 0;
-    
-    // First pass: determine which are benched
     slots.forEach(slot => {
-        const playerName = (slot.dataset.playerName || '').toLowerCase();
-        const isInLobby = playerName && spectatedPlayers.includes(playerName);
-        
-        if (isInLobby) {
-            slot.classList.add('in-lobby');
-            slot.classList.remove('overflow-hidden');
-        } else if (playerName) {
-            slot.classList.remove('in-lobby');
-            benchedCount++;
+        if (slot.dataset.playerName) {
+            totalPlayers++;
+            const name = slot.dataset.playerName.toLowerCase();
+            if (spectatedPlayers.some(p => p.toLowerCase() === name)) {
+                activeCount++;
+                slot.classList.add('in-lobby');
+                slot.classList.remove('overflow-hidden');
+            } else {
+                slot.classList.remove('in-lobby');
+            }
         } else {
-            // Empty slot (no player assigned)
-            slot.classList.add('in-lobby');
+            slot.style.display = 'none';
         }
     });
     
-    // Second pass: show only first 4 benched, hide rest
-    visibleCount = 0;
+    const benchedCount = totalPlayers - activeCount;
+    
+    // Show only first 4 benched, hide rest
+    let visibleCount = 0;
     slots.forEach(slot => {
-        if (!slot.classList.contains('in-lobby') && slot.dataset.playerName) {
+        if (slot.dataset.playerName && !slot.classList.contains('in-lobby')) {
             if (visibleCount < 4) {
                 slot.classList.remove('overflow-hidden');
                 visibleCount++;
@@ -428,7 +403,7 @@ function processBenchedPlayers(container, overflowEl, spectatedPlayers) {
         }
     });
     
-    // Update overflow indicator
+    // Overflow
     const overflow = benchedCount - visibleCount;
     if (overflow > 0) {
         overflowEl.textContent = `+${overflow}`;
@@ -715,13 +690,24 @@ function updateTeamPicks(side) {
         const banSlots = document.createElement('div');
         banSlots.className = 'picks-slots';
         
+        const banSlotsArray = [];
         for (let i = 0; i < CONFIG.maxBans; i++) {
             const tag = document.createElement('span');
             tag.className = `pick-tag ban team-${side}`;
-            tag.textContent = bans[i] ? (bans[i].pick || '') : '—';
-            if (!bans[i]) tag.classList.add('empty');
-            banSlots.appendChild(tag);
+            // For right team, bans fill from the end
+            const banIndex = isLeft ? i : (CONFIG.maxBans - 1 - i);
+            if (bans[banIndex]) {
+                tag.textContent = bans[banIndex].map || bans[banIndex].pick || '';
+            } else {
+                tag.textContent = '—';
+                tag.classList.add('empty');
+            }
+            banSlotsArray.push(tag);
         }
+        
+        // For right team, reverse so filled slots are on the right
+        if (!isLeft) banSlotsArray.reverse();
+        banSlotsArray.forEach(tag => banSlots.appendChild(tag));
         
         if (isLeft) {
             banRow.appendChild(banLabel);
@@ -745,13 +731,24 @@ function updateTeamPicks(side) {
         const protSlots = document.createElement('div');
         protSlots.className = 'picks-slots';
         
+        const protSlotsArray = [];
         for (let i = 0; i < CONFIG.maxProtects; i++) {
             const tag = document.createElement('span');
             tag.className = `pick-tag protect team-${side}`;
-            tag.textContent = protects[i] ? (protects[i].pick || '') : '—';
-            if (!protects[i]) tag.classList.add('empty');
-            protSlots.appendChild(tag);
+            // For right team, protects fill from the end
+            const protIndex = isLeft ? i : (CONFIG.maxProtects - 1 - i);
+            if (protects[protIndex]) {
+                tag.textContent = protects[protIndex].map || protects[protIndex].pick || '';
+            } else {
+                tag.textContent = '—';
+                tag.classList.add('empty');
+            }
+            protSlotsArray.push(tag);
         }
+        
+        // For right team, reverse so filled slots are on the right
+        if (!isLeft) protSlotsArray.reverse();
+        protSlotsArray.forEach(tag => protSlots.appendChild(tag));
         
         if (isLeft) {
             protRow.appendChild(protLabel);
@@ -776,7 +773,7 @@ function renderPointsDots() {
     for (let i = 0; i < maxPoints; i++) {
         const leftDot = document.createElement('div');
         leftDot.className = 'match-point';
-        leftDot.id = `point-left-${i}`;
+        leftDot.id = `point-left-${maxPoints - i - 1}`;
         els.pointsLeftDots.appendChild(leftDot);
         
         const rightDot = document.createElement('div');
@@ -802,6 +799,13 @@ socket.onerror = (error) => {
 socket.onmessage = (event) => {
     let data = JSON.parse(event.data);
     const beatmap = data.beatmap;
+    
+    // Debug logging
+    if (DEBUG) console.log('[Gameplay] WebSocket data:', data);
+    if (data.tourney?.clients) {
+        console.log('[Gameplay] Tourney clients count:', data.tourney.clients.length);
+        console.log('[Gameplay] Tourney clients:', data.tourney.clients.map(c => c.user?.name));
+    }
 
     // Beatmap change detection
     if (state.beatmapId !== beatmap.id) {
@@ -913,35 +917,19 @@ socket.onmessage = (event) => {
         }
     }
 
-    // Update player names
-    if (data.tourney?.clients?.[0]?.user?.name) {
-        const newPlayerLeft = data.tourney.clients[0].user.name;
-        if (state.playerLeft !== newPlayerLeft) {
+    // Update player names - check ALL clients, not just first 2
+    if (data.tourney?.clients) {
+        const clientNames = data.tourney.clients.map(c => c.user?.name).filter(Boolean);
+        const newPlayerLeft = data.tourney.clients[0]?.user?.name;
+        const newPlayerRight = data.tourney.clients[1]?.user?.name;
+        
+        if (state.playerLeft !== newPlayerLeft || state.playerRight !== newPlayerRight) {
             state.playerLeft = newPlayerLeft;
-            // Update active players list
-            state.activePlayers = [];
-            if (data.tourney.clients[0]?.user?.name) {
-                state.activePlayers.push(data.tourney.clients[0].user.name);
-            }
-            if (data.tourney.clients[1]?.user?.name) {
-                state.activePlayers.push(data.tourney.clients[1].user.name);
-            }
-            updateActivePlayers();
-        }
-    }
-
-    if (data.tourney?.clients?.[1]?.user?.name) {
-        const newPlayerRight = data.tourney.clients[1].user.name;
-        if (state.playerRight !== newPlayerRight) {
             state.playerRight = newPlayerRight;
-            // Update active players list
-            state.activePlayers = [];
-            if (data.tourney.clients[0]?.user?.name) {
-                state.activePlayers.push(data.tourney.clients[0].user.name);
-            }
-            if (data.tourney.clients[1]?.user?.name) {
-                state.activePlayers.push(data.tourney.clients[1].user.name);
-            }
+            
+            // Update active players list with ALL clients
+            state.activePlayers = clientNames;
+            console.log('[Gameplay] Active players (all clients):', state.activePlayers);
             updateActivePlayers();
         }
     }
@@ -962,6 +950,7 @@ socket.onmessage = (event) => {
     updateChat(data);
     
     // Always update benched players on every message
+    console.log('[Gameplay] Active players (always update):', state.activePlayers);
     updateActivePlayers();
 };
 
