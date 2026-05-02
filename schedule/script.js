@@ -2,7 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSchedule();
-    startAutoScroll();
 });
 
 // Team logo map
@@ -301,32 +300,3 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Auto-scroll the schedule list smoothly
-function startAutoScroll() {
-    const container = document.querySelector('.schedule-container');
-    if (!container) return;
-    
-    let scrollDirection = 1; // 1 = down, -1 = up
-    let scrollSpeed = 0.5; // pixels per frame
-    let pauseTimer = null;
-    
-    function scroll() {
-        if (pauseTimer) return;
-        
-        container.scrollTop += scrollDirection * scrollSpeed;
-        
-        // Reverse at boundaries
-        if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
-            scrollDirection = -1;
-            pauseTimer = setTimeout(() => { pauseTimer = null; }, 2000); // pause at bottom
-        } else if (container.scrollTop <= 0) {
-            scrollDirection = 1;
-            pauseTimer = setTimeout(() => { pauseTimer = null; }, 2000); // pause at top
-        }
-        
-        requestAnimationFrame(scroll);
-    }
-    
-    // Start after a short delay
-    setTimeout(() => requestAnimationFrame(scroll), 3000);
-}

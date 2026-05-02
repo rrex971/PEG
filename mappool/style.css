@@ -77,10 +77,6 @@ body {
     width: auto;
 }
 
-#title {
-    display: none;
-}
-
 #round {
     font-family: MoonGET;
     font-size: 1.5rem;
@@ -303,6 +299,16 @@ body {
     color: var(--mod-nm);
 }
 
+.pick-log-item.pick.team-left {
+    border-color: var(--peg-yellow);
+    color: var(--peg-yellow);
+}
+
+.pick-log-item.pick.team-right {
+    border-color: var(--peg-coral);
+    color: var(--peg-coral);
+}
+
 .pick-log-item.ban {
     background-color: rgba(122, 83, 83, 0.8);
     color: var(--mod-hr);
@@ -310,10 +316,36 @@ body {
     border-color: var(--mod-hr);
 }
 
+.pick-log-item.ban.team-left {
+    background-color: rgba(122, 83, 83, 0.8);
+    color: var(--peg-yellow);
+    text-decoration: line-through;
+    border-color: var(--peg-yellow);
+}
+
+.pick-log-item.ban.team-right {
+    background-color: rgba(122, 83, 83, 0.8);
+    color: var(--peg-coral);
+    text-decoration: line-through;
+    border-color: var(--peg-coral);
+}
+
 .pick-log-item.protect {
     background-color: rgba(83, 122, 83, 0.8);
     color: var(--mod-fm);
     border-color: var(--mod-fm);
+}
+
+.pick-log-item.protect.team-left {
+    background-color: rgba(83, 122, 83, 0.8);
+    color: var(--peg-yellow);
+    border-color: var(--peg-yellow);
+}
+
+.pick-log-item.protect.team-right {
+    background-color: rgba(83, 122, 83, 0.8);
+    color: var(--peg-coral);
+    border-color: var(--peg-coral);
 }
 
 .pick-log-item.tiebreaker {
@@ -475,6 +507,9 @@ body {
 #title {
     font-size: 1.3rem;
     font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #title.overflow-animate {
@@ -819,6 +854,42 @@ body {
     animation: mapFlash 0.4s ease-out;
 }
 
+/* Strobe flash animation for picks */
+@keyframes strobeFlash {
+    0% { opacity: 1; }
+    40% { opacity: 0; }
+    41% { opacity: 1; }
+    80% { opacity: 0; }
+    81% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.map.strobe-flash {
+    position: relative;
+}
+
+/* Strobe overlay - separate DOM element instead of ::after */
+.map .strobe-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+}
+
+.map.strobe-flash .strobe-overlay {
+    animation: strobeFlash 2s ease-out forwards;
+}
+
+.map.strobe-flash .strobe-overlay.team-1 {
+    background: var(--peg-yellow, #ffd700);
+}
+
+.map.strobe-flash .strobe-overlay.team-2 {
+    background: var(--peg-coral, #ff6b6b);
+}
+
 /* Picked by team 1 — yellow border */
 .map.picked-by-1 {
     border: 3px solid var(--peg-yellow, #ffd700) !important;
@@ -829,16 +900,28 @@ body {
     border: 3px solid var(--peg-coral, #ff6b6b) !important;
 }
 
-/* Banned by team 1 — dimmed with yellow border */
-.map.banned-by-1 {
-    opacity: 0.4;
-    border-color: var(--peg-yellow, #ffd700) !important;
+/* Remove the old ::after overlay approach for bans */
+.map.banned-by-1::after,
+.map.banned-by-2::after {
+    display: none;
 }
 
-/* Banned by team 2 — dimmed with coral border */
+/* Dim EVERYTHING on the card */
+.map.banned-by-1,
 .map.banned-by-2 {
-    opacity: 0.4;
+    filter: brightness(0.35) saturate(0.3);
+    position: relative;
+}
+
+/* Keep the border color visible through the dim */
+.map.banned-by-1 {
+    border-color: var(--peg-yellow, #ffd700) !important;
+    filter: brightness(0.35) saturate(0.3) drop-shadow(0 0 2px var(--peg-yellow, #ffd700));
+}
+
+.map.banned-by-2 {
     border-color: var(--peg-coral, #ff6b6b) !important;
+    filter: brightness(0.35) saturate(0.3) drop-shadow(0 0 2px var(--peg-coral, #ff6b6b));
 }
 
 /* Protected — green border */
@@ -858,6 +941,7 @@ body {
     padding: 4px 10px;
     border-radius: 6px;
     z-index: 5;
+    animation: labelSlideIn 0.3s ease-out;
 }
 
 /* Team 1 pick — yellow background */
@@ -872,14 +956,26 @@ body {
     color: white;
 }
 
-/* Banned — team-colored border + dimmed */
+/* Banned — coral */
 .map-status-label.banned {
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--peg-coral, #ff6b6b);
     color: white;
 }
 
-/* Protected */
+/* Protected — green */
 .map-status-label.protected {
-    background: rgba(80, 200, 120, 0.9);
+    background: #50c878;
     color: white;
+}
+
+/* Label slide-in animation */
+@keyframes labelSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

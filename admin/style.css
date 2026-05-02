@@ -189,6 +189,7 @@ button.danger:hover {
 }
 
 .map-card {
+    position: relative;
     background: white;
     border-bottom: 2px solid rgba(43, 76, 90, 0.15);
     border-radius: 8px;
@@ -206,6 +207,42 @@ button.danger:hover {
 .map-card:hover {
     border-color: var(--peg-blue-dark, #5a9cb5);
     box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Strobe flash animation for picks */
+@keyframes strobeFlash {
+    0% { opacity: 1; }
+    40% { opacity: 0; }
+    41% { opacity: 1; }
+    80% { opacity: 0; }
+    81% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.map-card.strobe-flash {
+    position: relative;
+}
+
+/* Strobe overlay - separate DOM element instead of ::after */
+.map-card .strobe-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+}
+
+.map-card.strobe-flash .strobe-overlay {
+    animation: strobeFlash 2s ease-out forwards;
+}
+
+.map-card.strobe-flash .strobe-overlay.team-1 {
+    background: var(--peg-yellow, #ffd700);
+}
+
+.map-card.strobe-flash .strobe-overlay.team-2 {
+    background: var(--peg-coral, #ff6b6b);
 }
 
 /* Popup */
@@ -309,13 +346,70 @@ button.danger:hover {
     background: rgba(255, 107, 107, 0.15);
 }
 
+/* Remove the old ::after overlay approach for bans */
+.map-card.banned::after {
+    display: none;
+}
+
+/* Dim EVERYTHING on the card */
 .map-card.banned {
-    border-color: var(--peg-coral, #fa6868);
-    background: rgba(255, 107, 107, 0.15);
-    opacity: 0.6;
+    filter: brightness(0.35) saturate(0.3) drop-shadow(0 0 2px var(--peg-coral, #fa6868));
+    position: relative;
+    border-color: var(--peg-coral, #fa6868) !important;
 }
 
 .map-card.protected {
     border-color: #50c878;
     background: rgba(80, 200, 120, 0.15);
+}
+
+/* Status label */
+.map-status-label {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    z-index: 5;
+    animation: labelSlideIn 0.3s ease-out;
+}
+
+/* Team 1 pick — yellow background */
+.map-status-label.picked-by-1 {
+    background: var(--peg-yellow, #ffd700);
+    color: var(--peg-ink, #2b4c5a);
+}
+
+/* Team 2 pick — red/coral background */
+.map-status-label.picked-by-2 {
+    background: var(--peg-coral, #ff6b6b);
+    color: white;
+}
+
+/* Banned — coral */
+.map-status-label.banned {
+    background: var(--peg-coral, #ff6b6b);
+    color: white;
+}
+
+/* Protected — green */
+.map-status-label.protected {
+    background: #50c878;
+    color: white;
+}
+
+/* Label slide-in animation */
+@keyframes labelSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
