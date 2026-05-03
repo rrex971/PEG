@@ -982,6 +982,31 @@ body {
     color: white;
 }
 
+/* TB HYPE — gradient yellow to coral */
+.map-status-label.tb-hype {
+    background: linear-gradient(135deg, var(--peg-yellow, #ffd700), var(--peg-coral, #ff6b6b));
+    color: white;
+    font-weight: 700;
+}
+
+/* Universal team name truncation — max 32 characters */
+.team-name,
+.match-team-name,
+.team-display-name,
+.team-left-name,
+.team-right-name,
+#team-left-name,
+#team-right-name,
+.log-team-name,
+.pick-tag,
+.map-status-label,
+.picks-label {
+    max-width: 32ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* Label slide-in animation */
 @keyframes labelSlideIn {
     from {

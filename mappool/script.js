@@ -1,11 +1,18 @@
 // PEG Mappool Overlay Script
 
+// Truncate team name to max length with ellipsis
+function truncateName(name, maxLen = 32) {
+    if (!name) return '';
+    return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
+}
+
 // Helper function for element selection
 const $ = (id) => document.getElementById(id);
 
 // Global state
 let currentMappool = null;
 let lastMappoolHash = '';
+let lastPicksState = {};
 
 // Mappool loading and rendering
 async function loadMappool() {
@@ -108,6 +115,7 @@ function createMapCard(beatmapId, mapData) {
     const mapElement = document.createElement('div');
     mapElement.classList.add('map');
     mapElement.dataset.beatmapId = beatmapId;
+    mapElement.dataset.pickId = mapData.pick;
     mapElement.mapData = mapData;
     
     // Add mod-specific class for color coding
@@ -259,7 +267,7 @@ function triggerStrobeFlash(card, player) {
 function applyMapAction(card, action, player, pickId, beatmapId) {
     // Get team name from localStorage
     const currentMatch = JSON.parse(localStorage.getItem('peg-current-match') || 'null');
-    const teamName = player === 1 ? (currentMatch?.team1Name || 'Team 1') : (currentMatch?.team2Name || 'Team 2');
+    const teamName = player === 1 ? (currentMatch?.team1Name || 'Team 1') : truncateName(currentMatch?.team2Name || 'Team 2');
     
     // Flash animation
     card.classList.remove('flash');
@@ -499,16 +507,20 @@ function updatePicksDisplay() {
             const actionClass = pick.action === 'picked' ? 'pick' :
                                pick.action === 'banned' ? 'ban' :
                                pick.action === 'protected' ? 'protect' : pick.action;
-            // Map player to team class
-            const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
             
             // Check if this is a tiebreaker
             const isTiebreaker = (pick.pick || '').startsWith('TB');
             
-            item.className = `pick-log-item ${actionClass} ${teamClass}`;
-            if (isTiebreaker) {
-                item.classList.add('tiebreaker');
+            // Build class list - don't add team classes for TB picks
+            let className = `pick-log-item ${actionClass}`;
+            if (!isTiebreaker) {
+                // Map player to team class (only for non-TB picks)
+                const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
+                className += ` ${teamClass}`;
+            } else {
+                className += ' tiebreaker';
             }
+            item.className = className;
             
             let prefix = '';
             if (pick.action === 'picked') prefix = 'PICK:';
@@ -544,16 +556,20 @@ function updatePicksDisplay() {
             const actionClass = pick.action === 'picked' ? 'pick' :
                                pick.action === 'banned' ? 'ban' :
                                pick.action === 'protected' ? 'protect' : pick.action;
-            // Map player to team class
-            const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
             
             // Check if this is a tiebreaker
             const isTiebreaker = (pick.pick || '').startsWith('TB');
             
-            item.className = `pick-log-item ${actionClass} ${teamClass}`;
-            if (isTiebreaker) {
-                item.classList.add('tiebreaker');
+            // Build class list - don't add team classes for TB picks
+            let className = `pick-log-item ${actionClass}`;
+            if (!isTiebreaker) {
+                // Map player to team class (only for non-TB picks)
+                const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
+                className += ` ${teamClass}`;
+            } else {
+                className += ' tiebreaker';
             }
+            item.className = className;
             
             let prefix = '';
             if (pick.action === 'picked') prefix = 'PICK:';
@@ -740,56 +756,93 @@ function clearAllPicks() {
 // Update map card status labels from localStorage picks
 function updateMapCardStatuses() {
     const picks = getPicks();
+    const currentState = {};
     
-    // Clear all existing status labels from map cards
-    document.querySelectorAll('.map .map-status-label').forEach(el => el.remove());
-    
-    // Remove all visual state classes from map cards
-    document.querySelectorAll('.map').forEach(card => {
-        card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2', 'protected', 'flash');
-    });
-    
-    // Apply status labels to map cards (newest pick first = most recent action wins)
-    // picks array is newest-first, so iterate and only apply the FIRST action per beatmapId
+    // Build current state from picks (newest first, so first action per beatmap wins)
     const appliedBeatmaps = new Set();
-    
-    picks.forEach(pickData => {
-        if (appliedBeatmaps.has(pickData.beatmapId)) return;
-        appliedBeatmaps.add(pickData.beatmapId);
-        
-        const mapCard = document.querySelector(`.map[data-beatmap-id="${pickData.beatmapId}"]`);
-        if (!mapCard) return;
-        
-        // Get team name from localStorage
-        const currentMatch = JSON.parse(localStorage.getItem('peg-current-match') || 'null');
-        const teamName = pickData.player === 1 ? (currentMatch?.team1Name || 'Team 1') :
-                        pickData.player === 2 ? (currentMatch?.team2Name || 'Team 2') : 'TB';
-        
-        // Determine status text and styling
-        let statusText = '';
-        let statusClass = '';
-        
-        if (pickData.action === 'picked') {
-            statusText = `PICKED BY ${teamName}`;
-            statusClass = `picked-by-${pickData.player}`;
-            mapCard.classList.add(`picked-by-${pickData.player}`);
-        } else if (pickData.action === 'banned') {
-            statusText = `BANNED BY ${teamName}`;
-            statusClass = 'banned';
-            mapCard.classList.add(`banned-by-${pickData.player}`);
-        } else if (pickData.action === 'protected') {
-            statusText = `PROTECTED BY ${teamName}`;
-            statusClass = 'protected';
-            mapCard.classList.add('protected');
-        }
-        
-        if (statusText) {
-            const statusLabel = document.createElement('div');
-            statusLabel.classList.add('map-status-label', statusClass);
-            statusLabel.textContent = statusText;
-            mapCard.appendChild(statusLabel);
+    picks.forEach(pick => {
+        const key = pick.beatmapId || pick.pick;
+        if (!appliedBeatmaps.has(key)) {
+            appliedBeatmaps.add(key);
+            currentState[key] = `${pick.action}-${pick.player}`;
         }
     });
+    
+    // Only update cards that changed
+    const stateHash = JSON.stringify(currentState);
+    if (stateHash === JSON.stringify(lastPicksState)) return; // No changes
+    lastPicksState = currentState;
+    
+    // Find which cards changed and update only those
+    document.querySelectorAll('.map').forEach(card => {
+        const beatmapId = card.dataset.beatmapId;
+        const newState = currentState[beatmapId];
+        const oldState = card.dataset.currentState;
+        
+        if (newState === oldState) return; // No change for this card
+        
+        card.dataset.currentState = newState || '';
+        
+        // Remove old states
+        card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2', 'protected');
+        const oldLabel = card.querySelector('.map-status-label');
+        if (oldLabel) oldLabel.remove();
+        
+        if (!newState) return; // No state for this card
+        
+        const [action, player] = newState.split('-');
+        
+        // Apply new state
+        if (action === 'picked') {
+            card.classList.add(`picked-by-${player}`);
+            triggerStrobeFlash(card, parseInt(player));
+        } else if (action === 'banned') {
+            card.classList.add(`banned-by-${player}`);
+        } else if (action === 'protected') {
+            card.classList.add('protected');
+        }
+        
+        // Add label
+        addStatusLabel(card, action, parseInt(player), beatmapId);
+    });
+}
+
+// Helper function to add status label to a card
+function addStatusLabel(card, action, player, beatmapId) {
+    // Get team name from localStorage
+    const currentMatch = JSON.parse(localStorage.getItem('peg-current-match') || 'null');
+    const teamName = player === 1 ? (currentMatch?.team1Name || 'Team 1') :
+                    player === 2 ? truncateName(currentMatch?.team2Name || 'Team 2') : 'TB';
+    
+    // Determine status text and styling
+    let statusText = '';
+    let statusClass = '';
+    
+    if (action === 'picked') {
+        // Check if this is a TB map
+        const pickId = card.dataset.pickId;
+        const isTB = pickId && pickId.toUpperCase().startsWith('TB');
+        if (isTB) {
+            statusText = 'TB HYPE';
+            statusClass = 'tb-hype';
+        } else {
+            statusText = `PICKED BY ${teamName}`;
+            statusClass = `picked-by-${player}`;
+        }
+    } else if (action === 'banned') {
+        statusText = `BANNED BY ${teamName}`;
+        statusClass = 'banned';
+    } else if (action === 'protected') {
+        statusText = `PROTECTED BY ${teamName}`;
+        statusClass = 'protected';
+    }
+    
+    if (statusText) {
+        const statusLabel = document.createElement('div');
+        statusLabel.classList.add('map-status-label', statusClass);
+        statusLabel.textContent = statusText;
+        card.appendChild(statusLabel);
+    }
 }
 
 // Twitch chat connection

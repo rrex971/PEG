@@ -3,6 +3,12 @@ let socket;
 let songArtist;
 let songTitle;
 
+// Truncate team name to max length with ellipsis
+function truncateName(name, maxLen = 32) {
+    if (!name) return '';
+    return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
+}
+
 // Configuration
 let CONFIG = {};
 fetch('../config.json')
@@ -215,11 +221,11 @@ function renderNextMatch() {
     
     // Get team names (handle different formats)
     const team1 = nextMatch.team1 || 'Team 1';
-    const team2 = nextMatch.team2 || 'Team 2';
+    const team2 = truncateName(nextMatch.team2 || 'Team 2');
     
     // Get team logos
     const logo1 = teamLogoMap[team1] || '';
-    const logo2 = teamLogoMap[team2] || '';
+    const logo2 = teamLogoMap[nextMatch.team2] || '';
     
     // Format date for display
     const dateDisplay = nextMatch.date ? nextMatch.date.replace(/\(.*?\)\s*/g, '').trim() : '';
@@ -237,11 +243,11 @@ function renderNextMatch() {
         <div class="players">
             <div class="player" id="player1">
                 <img class="team-logo" src="${logo1}" alt="" />
-                <span class="playername">${escapeHtml(team1)}</span>
+                <span class="playername">${escapeHtml(truncateName(team1))}</span>
             </div>
             <div class="player" id="player2">
                 <img class="team-logo" src="${logo2}" alt="" />
-                <span class="playername">${escapeHtml(team2)}</span>
+                <span class="playername">${escapeHtml(truncateName(team2))}</span>
             </div>
         </div>
     `;
@@ -253,6 +259,12 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Truncate team names to 32 characters
+function truncateName(name, maxLen = 32) {
+    if (!name) return '';
+    return name.length > maxLen ? name.substring(0, maxLen) + '...' : name;
 }
 
 let tempSong;
