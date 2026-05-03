@@ -1,5 +1,11 @@
 // Schedule Screen JavaScript
 
+// Truncate team name to max length with ellipsis
+function truncateName(name, maxLen = 32) {
+    if (!name) return '';
+    return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadSchedule();
 });
@@ -50,7 +56,14 @@ async function loadSchedule() {
         // Process matches with status and scores
         const processedMatches = await processMatchesWithScores(data.matches);
         
-        processedMatches.forEach((match) => {
+        // Filter to only upcoming matches
+        const now = new Date();
+        const upcomingMatches = processedMatches.filter(match => {
+            const matchDate = parseToUTC8(match.date || match.dateTime);
+            return matchDate && matchDate.getTime() > now.getTime();
+        });
+        
+        upcomingMatches.forEach((match) => {
             const matchCard = createMatchCard(match);
             matchesGrid.appendChild(matchCard);
         });
@@ -225,23 +238,28 @@ function parseToUTC8(dateStr) {
     return new Date(sgtMs);
 }
 
-// Get time until match (countdown)
+// Get time until match (countdown) - formatted like thanksforwatching
 function getTimeUntilMatch(dateStr) {
     const matchDate = parseToUTC8(dateStr);
     if (!matchDate) return '';
     
     const now = new Date();
-    const diff = matchDate.getTime() - now.getTime();
+    const diffMs = matchDate.getTime() - now.getTime();
     
-    if (diff < 0) return 'LIVE / PASSED';
+    if (diffMs <= 0) return 'now';
     
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const diffHours = diffMs / (1000 * 60 * 60);
+    const diffMinutes = diffMs / (1000 * 60);
     
-    if (days > 0) return `${days}d ${hours}h`;
-    if (hours > 0) return `${hours}h ${minutes}m`;
-    return `${minutes}m`;
+    if (diffMinutes < 60) {
+        const minutes = Math.round(diffMinutes);
+        return `in about ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+    } else if (diffHours < 1.5) {
+        return 'in about 1 hour';
+    } else {
+        const hours = Math.round(diffHours);
+        return `in about ${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+    }
 }
 
 function createMatchCard(match) {
@@ -254,11 +272,11 @@ function createMatchCard(match) {
     
     // Get team names
     const team1 = match.team1 || 'Team 1';
-    const team2 = match.team2 || 'Team 2';
+    const team2 = truncateName(match.team2 || 'Team 2');
     
     // Get team logos
     const logo1 = teamLogoMap[team1] || '';
-    const logo2 = teamLogoMap[team2] || '';
+    const logo2 = teamLogoMap[match.team2] || '';
     
     // Build card content with time on top row
     const countdown = getTimeUntilMatch(match.date);

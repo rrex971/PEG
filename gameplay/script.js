@@ -26,6 +26,12 @@ fetch('../config.json')
         };
     });
 
+// Truncate team name to max length with ellipsis
+function truncateName(name, maxLen = 32) {
+    if (!name) return '';
+    return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
+}
+
 // Helper function to get elements by ID
 const $ = (id) => document.getElementById(id);
 
@@ -201,7 +207,7 @@ async function fetchTeams() {
             const team2 = teamsData.teams.find(t => t.name === currentMatch.team2Name);
             
             if (team1) {
-                els.teamLeftName.textContent = team1.name;
+                els.teamLeftName.textContent = truncateName(team1.name);
                 if (els.teamLeftLogo && team1.teamId) {
                     els.teamLeftLogo.src = `../data/logos/${team1.teamId}.png`;
                 }
@@ -209,22 +215,22 @@ async function fetchTeams() {
                 enrichTeamWithOsuIds(team1, osuIdLookup);
                 renderTeamSlots('left', team1);
             } else {
-                els.teamLeftName.textContent = currentMatch.team1Name || 'TEAM LEFT';
+                els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
             }
             if (team2) {
-                els.teamRightName.textContent = team2.name;
+                els.teamRightName.textContent = truncateName(team2.name);
                 if (els.teamRightLogo && team2.teamId) {
                     els.teamRightLogo.src = `../data/logos/${team2.teamId}.png`;
                 }
                 enrichTeamWithOsuIds(team2, osuIdLookup);
                 renderTeamSlots('right', team2);
             } else {
-                els.teamRightName.textContent = currentMatch.team2Name || 'TEAM RIGHT';
+                els.teamRightName.textContent = truncateName(currentMatch.team2Name);
             }
         } catch (error) {
             console.error('Error loading teams.json:', error);
-            els.teamLeftName.textContent = currentMatch.team1Name || 'TEAM LEFT';
-            els.teamRightName.textContent = currentMatch.team2Name || 'TEAM RIGHT';
+            els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
+            els.teamRightName.textContent = truncateName(currentMatch.team2Name);
         }
     } else if (state.teams && state.teams.length > 0) {
         // No admin match set — use draft API teams directly
@@ -234,12 +240,12 @@ async function fetchTeams() {
 
         if (state.teams[team1Index]) {
             renderTeamSlots('left', state.teams[team1Index]);
-            els.teamLeftName.textContent = state.teams[team1Index].name || 'TEAM LEFT';
+            els.teamLeftName.textContent = truncateName(state.teams[team1Index].name || 'TEAM LEFT');
             updateTeamLogo('left', state.teams[team1Index]);
         }
         if (state.teams[team2Index]) {
             renderTeamSlots('right', state.teams[team2Index]);
-            els.teamRightName.textContent = state.teams[team2Index].name || 'TEAM RIGHT';
+            els.teamRightName.textContent = truncateName(state.teams[team2Index].name);
             updateTeamLogo('right', state.teams[team2Index]);
         }
     }
@@ -508,7 +514,7 @@ function renderTeamBlock(teamData, side) {
     // Team name
     const name = document.createElement('div');
     name.className = 'team-name';
-    name.textContent = teamData.name || `Team ${side === 'left' ? '1' : '2'}`;
+    name.textContent = truncateName(teamData.name || `Team ${side === 'left' ? '1' : '2'}`);
     block.appendChild(name);
     
     // Avatars
@@ -1035,8 +1041,8 @@ document.addEventListener('DOMContentLoaded', () => {
             (currentMatch.team1Name !== state.currentMatch?.team1Name ||
              currentMatch.team2Name !== state.currentMatch?.team2Name)) {
             state.currentMatch = currentMatch;
-            els.teamLeftName.textContent = currentMatch.team1Name || 'TEAM LEFT';
-            els.teamRightName.textContent = currentMatch.team2Name || 'TEAM RIGHT';
+            els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
+            els.teamRightName.textContent = truncateName(currentMatch.team2Name);
             
             // Build osuId lookup from draft API
             let osuIdLookup = {};
@@ -1071,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const team2 = teamsData.teams.find(t => t.name === currentMatch.team2Name);
                 
                 if (team1) {
-                    els.teamLeftName.textContent = team1.name;
+                    els.teamLeftName.textContent = truncateName(team1.name);
                     if (els.teamLeftLogo && team1.teamId) {
                         els.teamLeftLogo.src = `../data/logos/${team1.teamId}.png`;
                     }
@@ -1079,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderTeamSlots('left', team1);
                 }
                 if (team2) {
-                    els.teamRightName.textContent = team2.name;
+                    els.teamRightName.textContent = truncateName(team2.name);
                     if (els.teamRightLogo && team2.teamId) {
                         els.teamRightLogo.src = `../data/logos/${team2.teamId}.png`;
                     }

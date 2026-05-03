@@ -268,7 +268,10 @@ body {
 .playername {
     font-size: 1.5rem;
     font-weight: 700;
-    max-width: 20ch;
+    max-width: 32ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--peg-ink);
     line-height: 1.2;
 }
@@ -410,6 +413,24 @@ body {
     color: var(--peg-white);
     min-width: 20px;
     text-align: center;
+}
+
+/* Universal team name truncation — max 32 characters */
+.team-name,
+.match-team-name,
+.team-display-name,
+.team-left-name,
+.team-right-name,
+#team-left-name,
+#team-right-name,
+.log-team-name,
+.pick-tag,
+.map-status-label,
+.picks-label {
+    max-width: 32ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #vs-pill {

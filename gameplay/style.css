@@ -1099,6 +1099,24 @@ body {
     box-sizing: border-box;
 }
 
+/* Universal team name truncation — max 32 characters */
+.team-name,
+.match-team-name,
+.team-display-name,
+.team-left-name,
+.team-right-name,
+#team-left-name,
+#team-right-name,
+.log-team-name,
+.pick-tag,
+.map-status-label,
+.picks-label {
+    max-width: 32ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* Tabular numbers for all number elements */
 .team-score,
 .stat-value,

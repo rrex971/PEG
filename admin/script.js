@@ -1,5 +1,11 @@
 // PEG Admin Panel Script
 
+// Truncate team name to max length with ellipsis
+function truncateName(name, maxLen = 32) {
+    if (!name) return '';
+    return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
+}
+
 // Global state
 let scheduleData = null;
 let teamsData = null;
@@ -136,13 +142,31 @@ function populateMatchSelect() {
         scheduleData.matches.forEach((match, index) => {
             const option = document.createElement('option');
             option.value = index;
-            option.textContent = `Match ${index + 1}: ${match.team1} vs ${match.team2}`;
+            option.textContent = `Match ${index + 1}: ${match.team1} vs ${truncateName(match.team2)}`;
             matchSelect.appendChild(option);
         });
     }
 
     // Set default selection
     matchSelect.value = currentMatchIndex;
+}
+
+// Sort mappool maps by mod category and number
+function sortMappool(mappool) {
+    const modOrder = { 'NM': 0, 'HD': 1, 'HR': 2, 'DT': 3, 'FM': 4, 'TB': 5 };
+    
+    return [...mappool].sort((a, b) => {
+        const aMod = a.pick?.replace(/[0-9]/g, '') || '';
+        const bMod = b.pick?.replace(/[0-9]/g, '') || '';
+        const aNum = parseInt(a.pick?.replace(/[^0-9]/g, '') || '0');
+        const bNum = parseInt(b.pick?.replace(/[^0-9]/g, '') || '0');
+        
+        const aOrder = modOrder[aMod] ?? 99;
+        const bOrder = modOrder[bMod] ?? 99;
+        
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        return aNum - bNum;
+    });
 }
 
 // Populate mappool grid
@@ -154,8 +178,20 @@ function populateMappoolGrid() {
 
     // Get all maps except the metadata keys
     const mapKeys = Object.keys(mappoolData).filter(key => key !== 'round');
+    
+    // Create array of map objects with their keys for sorting
+    const mapObjects = mapKeys.map(key => ({
+        key: key,
+        pick: mappoolData[key].pick,
+        artist: mappoolData[key].artist,
+        title: mappoolData[key].title
+    }));
+    
+    // Sort maps by mod category and number
+    const sortedMaps = sortMappool(mapObjects);
+    const sortedKeys = sortedMaps.map(map => map.key);
 
-    mapKeys.forEach(key => {
+    sortedKeys.forEach(key => {
         const map = mappoolData[key];
         const card = document.createElement('div');
         card.className = 'map-card';
@@ -181,6 +217,20 @@ function populateMappoolGrid() {
 function showMapActionPopup(card, mapId, mapData) {
     const popup = document.getElementById('map-action-popup');
     if (!popup) return;
+    
+    const standardActions = document.getElementById('popup-actions-standard');
+    const tbActions = document.getElementById('popup-actions-tb');
+    
+    // Check if this is a TB map
+    const isTB = mapData.pick && mapData.pick.toUpperCase().startsWith('TB');
+    
+    // Show/hide appropriate action buttons
+    if (standardActions) {
+        standardActions.style.display = isTB ? 'none' : 'flex';
+    }
+    if (tbActions) {
+        tbActions.style.display = isTB ? 'flex' : 'none';
+    }
     
     // Get the clicked card's position
     const rect = card.getBoundingClientRect();
@@ -416,8 +466,8 @@ function updateTeamDisplay() {
 
     if (scheduleData && scheduleData.matches && scheduleData.matches[currentMatchIndex]) {
         const match = scheduleData.matches[currentMatchIndex];
-        teamLeftName.textContent = match.team1;
-        teamRightName.textContent = match.team2;
+        teamLeftName.textContent = truncateName(match.team1);
+        teamRightName.textContent = truncateName(match.team2);
     } else {
         teamLeftName.textContent = 'No match selected';
         teamRightName.textContent = 'No match selected';

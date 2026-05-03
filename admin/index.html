@@ -81,13 +81,16 @@
     <!-- Map Action Popup -->
     <div id="map-action-popup" class="map-action-popup" style="display: none;">
         <div class="popup-title">Map Action</div>
-        <div class="popup-actions">
+        <div class="popup-actions" id="popup-actions-standard">
             <button class="popup-btn pick" data-action="picked" data-player="1">Pick (Team 1)</button>
             <button class="popup-btn pick" data-action="picked" data-player="2">Pick (Team 2)</button>
             <button class="popup-btn ban" data-action="banned" data-player="1">Ban (Team 1)</button>
             <button class="popup-btn ban" data-action="banned" data-player="2">Ban (Team 2)</button>
             <button class="popup-btn protect" data-action="protected" data-player="1">Protect (Team 1)</button>
             <button class="popup-btn protect" data-action="protected" data-player="2">Protect (Team 2)</button>
+        </div>
+        <div class="popup-actions" id="popup-actions-tb" style="display: none;">
+            <button class="popup-btn pick" data-action="picked" data-player="0">Pick TB</button>
         </div>
         <button class="popup-close">✕</button>
     </div>
