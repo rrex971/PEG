@@ -37,13 +37,10 @@ let tempId = -1;
 let mappool = {};
 let customEntries = [];
 
-// Load mappool and separate custom entries (where value.custom === true)
 fetch('mappool.json')
     .then(response => response.json())
     .then(data => {
         mappool = data;
-        // Extract custom entries for later title‑based matching.
-        // `key` is the unique word from the title (e.g., "Anemone"), `pick` is the display text (e.g., "HD2").
         customEntries = Object.entries(data)
             .filter(([, v]) => v && typeof v === 'object' && v.custom)
             .map(([k, v]) => ({ key: k, pick: v.pick }));
@@ -54,27 +51,22 @@ fetch('mappool.json')
 socket.onmessage = event => {
     let data = JSON.parse(event.data);
     const beatmap = data.beatmap;
+    const play = data.play;
 
     if (tempId !== beatmap.id) {
         tempId = beatmap.id;
         
-        // Update Text
         title.innerHTML = beatmap.title;
         artist.innerHTML = beatmap.artist;
         mapper.innerHTML = `Mapped by ${beatmap.mapper}`;
         difficulty.innerHTML = `[${beatmap.version}]`;
         
-        // Update Background
         mapBg.src = `https://assets.ppy.sh/beatmaps/${beatmap.set}/covers/cover@2x.jpg`;
         
-        // Update Pick Badge
         if (mappool[beatmap.id]) {
-            // Standard map entry (numeric id)
             pickBadge.innerHTML = mappool[beatmap.id];
             pickBadge.style.display = "block";
         } else {
-            // Try custom entries: match by title containing the custom pick string
-            // Match custom entries by checking if the beatmap title contains the unique key word.
             const customMatch = customEntries.find(entry => beatmap.title && beatmap.title.includes(entry.key));
             if (customMatch) {
                 pickBadge.innerHTML = customMatch.pick;
@@ -84,16 +76,11 @@ socket.onmessage = event => {
             }
         }
 
-        // Update Stats
         sr.update(beatmap.stats.stars?.total ?? 0);
         bpm.update(beatmap.stats.bpm?.common ?? 0);
-        // Duration is provided under beatmap.time.mp3Length (milliseconds)
-        const lengthMs = beatmap.time?.mp3Length ?? 0;
+        const lengthMs =  (beatmap.time?.lastObject - beatmap.time?.firstObject) / play.mods.rate ?? 0;
         length.update(lengthMs / 1000);
-        // Debug: log stats object to see available fields
         console.log('beatmap stats:', beatmap.stats);
-        // Some beatmap data may not have the "converted" field (e.g., older osu! versions).
-        // Fallback to the raw value if "converted" is undefined.
         const csVal = beatmap.stats.cs?.converted ?? beatmap.stats.cs ?? 0;
         const arVal = beatmap.stats.ar?.converted ?? beatmap.stats.ar ?? 0;
         const odVal = beatmap.stats.od?.converted ?? beatmap.stats.od ?? 0;
@@ -103,7 +90,6 @@ socket.onmessage = event => {
         od.update(odVal);
         hp.update(hpVal);
 
-        // Handle Title Overflow
         title.classList.remove('overflow-animate');
         setTimeout(() => {
             if (title.scrollWidth > title.clientWidth) {
