@@ -34,6 +34,7 @@ const bpm = new CountUp("bpm", 0, 0, 2, duration, { useEasing: true, useGrouping
 const sr = new CountUp("sr", 0, 0, 2, 0.3, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
 
 let tempId = -1;
+let tempMods = -1;
 let mappool = {};
 let customEntries = [];
 
@@ -53,8 +54,9 @@ socket.onmessage = event => {
     const beatmap = data.beatmap;
     const play = data.play;
 
-    if (tempId !== beatmap.id) {
+    if (tempId !== beatmap.id || play.mods.checksum !== tempMods) {
         tempId = beatmap.id;
+        tempMods = play.mods.checksum;
         
         title.innerHTML = beatmap.title;
         artist.innerHTML = beatmap.artist;
