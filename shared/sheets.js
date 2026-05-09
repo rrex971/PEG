@@ -48,13 +48,13 @@ const PEGSheets = {
                 }
             }
             
-            // Parse matches from K106:AR113 range
-            // Column mapping in this range:
-            // Column 0 (K): Match ID or empty
-            // Column 1 (L): Date like "(Sat) May 2"
-            // Column 2 (M): Time like "9:30PM"
-            // Columns around 16-17 (AA-AB): Team 1 name
-            // Columns around 30+ (AR area): Team 2 name
+            // Parse matches from H84:AR91 range
+            // Column mapping in this range (0-based from H):
+            // Column 3 (K): Match ID
+            // Column 4 (L): Date like "(Sat) May 2"
+            // Column 5 (M): Time like "9:30PM"
+            // Column 19 (AA): Team 1 name
+            // Last column (AR): Team 2 name
             let matchesFound = 0;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
@@ -65,22 +65,26 @@ const PEGSheets = {
                 }
                 
                 // Try to find match data in this row
-                // Look for date in column 1 (L) as an indicator of match data
-                const date = row.length > 1 ? String(row[1]).trim() : '';
-                const time = row.length > 2 ? String(row[2]).trim() : '';
+                // Look for date in column 4 (L) as an indicator of match data
+                const date = row.length > 4 ? String(row[4]).trim() : '';
+                const time = row.length > 5 ? String(row[5]).trim() : '';
                 
                 // Only process rows that have a date (indicating match data)
                 if (date && date.length > 2) {
-                    // Extract team names from columns around 16-17 (AA-AB) and 30+ (AR area)
-                    // Team 1 is around column 16 (AA)
-                    const team1 = row.length > 16 ? String(row[16]).trim() : '';
+                    // Extract match ID from column 3 (K)
+                    const matchId = row.length > 3 ? String(row[3]).trim() : '';
                     
-                    // Team 2 is around the last column (AR area)
+                    // Extract team names from columns 19 (AA) and last column (AR)
+                    // Team 1 is in column 19 (AA)
+                    const team1 = row.length > 19 ? String(row[19]).trim() : '';
+                    
+                    // Team 2 is in the last column (AR)
                     const team2 = row.length > 0 ? String(row[row.length - 1]).trim() : '';
                     
                     // Only add if we have valid team names
                     if (team1 && team2 && team1.length > 2 && team2.length > 2) {
                         scheduleData.matches.push({
+                            matchId: matchId,
                             team1: team1,
                             team2: team2,
                             time: time,

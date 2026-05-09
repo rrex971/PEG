@@ -10,8 +10,12 @@ const DEBUG = false;
 let CONFIG = {};
 fetch('../config.json')
     .then(r => r.json())
-    .then(data => { CONFIG = data; })
-    .catch(() => {
+    .then(cfg => {
+        Object.assign(CONFIG, cfg);
+        renderPointsDots();
+    })
+    .catch(err => {
+        console.warn('Config load failed, using defaults:', err);
         // Fallback defaults
         CONFIG = {
             bestOf: 9,
@@ -24,6 +28,7 @@ fetch('../config.json')
             pickTimer: 30,
             banTimer: 30
         };
+        renderPointsDots();
     });
 
 // Truncate team name to max length with ellipsis
@@ -485,7 +490,7 @@ function updatePill() {
 function updatePoints() {
     const leftPoints = state.starsLeft || 0;
     const rightPoints = state.starsRight || 0;
-    const maxPoints = Math.floor((CONFIG.bestOf || 9) / 2) + 1;
+    const maxPoints = CONFIG.maxPoints || (Math.floor((CONFIG.bestOf || 9) / 2) + 1);
     
     // Update left dots
     for (let i = 0; i < maxPoints; i++) {
@@ -782,7 +787,7 @@ function updateTeamPicks(side) {
 
 // Render points dots dynamically based on CONFIG.bestOf
 function renderPointsDots() {
-    const maxPoints = Math.floor((CONFIG.bestOf || 9) / 2) + 1;
+    const maxPoints = CONFIG.maxPoints || (Math.floor((CONFIG.bestOf || 9) / 2) + 1);
     
     // Clear existing dots
     els.pointsLeftDots.innerHTML = '';
@@ -1030,9 +1035,6 @@ function updateChat(data) {
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
     if (DEBUG) console.log('PEG Gameplay Overlay loaded');
-
-    // Render points dots based on CONFIG.maxPoints
-    renderPointsDots();
 
     // Fetch team data on load
     fetchTeams().then(() => {
