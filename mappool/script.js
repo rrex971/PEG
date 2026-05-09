@@ -13,6 +13,32 @@ const $ = (id) => document.getElementById(id);
 let currentMappool = null;
 let lastMappoolHash = '';
 let lastPicksState = {};
+let customEntries = [];
+
+// CountUp formatters
+const timeFormatter = (value) => {
+    const seconds = Math.round(value);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
+};
+
+const smartDecimalFormatter = (value) => {
+    return value.toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
+};
+
+// CountUp instances
+const duration = 0.5;
+const lengthAni = new CountUp("length", 0, 0, 0, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: timeFormatter });
+const cs = new CountUp("csval", 0, 0, 2, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
+const ar = new CountUp("arval", 0, 0, 2, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
+const od = new CountUp("odval", 0, 0, 2, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
+const hp = new CountUp("hpval", 0, 0, 2, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
+const bpmAni = new CountUp("bpm", 0, 0, 2, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
+const srAni = new CountUp("sr", 0, 0, 2, 0.3, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
 
 // Mappool loading and rendering
 async function loadMappool() {
@@ -33,6 +59,11 @@ async function loadMappool() {
         }
         lastMappoolHash = mappoolHash;
         currentMappool = mappool;
+
+        // Extract custom entries for title-based matching
+        customEntries = Object.entries(mappool)
+            .filter(([, v]) => v && typeof v === 'object' && v.custom)
+            .map(([k, v]) => ({ key: k, pick: v.pick }));
         
         // Update round name
         if (mappool.round) {
@@ -329,6 +360,7 @@ const HOST = '127.0.0.1:24050';
 const socket = new ReconnectingWebSocket(`ws://${HOST}/websocket/v2`);
 
 let currentMapId = null;
+let lastMods = '';
 
 socket.onopen = () => {
     console.log('Successfully connected to tosu WebSocket');
@@ -346,9 +378,10 @@ socket.onmessage = (event) => {
     try {
         const data = JSON.parse(event.data);
         
-        // Check if beatmap changed
-        if (data.beatmap && data.beatmap.id !== currentMapId) {
+        // Check if beatmap or mods changed
+        if (data.beatmap && (data.beatmap.id !== currentMapId || data.play?.mods?.checksum !== lastMods)) {
             currentMapId = data.beatmap.id;
+            lastMods = data.play?.mods?.checksum;
             
             // Remove active class from all maps
             document.querySelectorAll('.map.active').forEach(map => {
@@ -380,77 +413,68 @@ socket.onmessage = (event) => {
             const mapperEl = document.getElementById('mapper');
             const pickBadgeEl = document.getElementById('pick-badge');
             
-            if (titleEl) titleEl.textContent = beatmap.title || 'Unknown Title';
+            if (titleEl) {
+                titleEl.textContent = beatmap.title || 'Unknown Title';
+                // Handle Title Overflow
+                titleEl.classList.remove('overflow-animate');
+                setTimeout(() => {
+                    if (titleEl.scrollWidth > titleEl.clientWidth) {
+                        titleEl.classList.add('overflow-animate');
+                    }
+                }, 0);
+            }
             if (artistEl) artistEl.textContent = beatmap.artist || 'Unknown Artist';
             if (difficultyEl) difficultyEl.textContent = `[${beatmap.version || 'Unknown'}]`;
             if (mapperEl) mapperEl.textContent = `Mapped by ${beatmap.mapper || 'Unknown'}`;
             
-            // Update pick badge from mappool
+            // Update pick badge from mappool with custom entry fallback
             if (currentMappool && beatmap.id) {
                 const mapEntry = currentMappool[beatmap.id];
                 if (mapEntry) {
-                    if (mapEntry.custom === undefined) {
-                        // Standard map entry (string value)
+                    if (typeof mapEntry === 'string') {
+                        // Standard map entry (string value from showcase/mappool.json)
                         if (pickBadgeEl) pickBadgeEl.textContent = mapEntry;
                     } else {
-                        // Custom map entry (object with pick property)
-                        if (pickBadgeEl) pickBadgeEl.textContent = mapEntry.pick;
+                        // Object entry (mappool_full.json format)
+                        if (pickBadgeEl) pickBadgeEl.textContent = mapEntry.pick || 'N/A';
                     }
                 } else {
-                    if (pickBadgeEl) pickBadgeEl.textContent = 'N/A';
+                    // Try custom entries: match by title containing the custom pick string
+                    const customMatch = customEntries.find(entry => beatmap.title && beatmap.title.includes(entry.key));
+                    if (customMatch) {
+                        if (pickBadgeEl) pickBadgeEl.textContent = customMatch.pick;
+                    } else {
+                        if (pickBadgeEl) pickBadgeEl.textContent = 'N/A';
+                    }
                 }
             }
             
-            // Update stats using tourney client data (preferred for tournament mode)
+            // Update stats using tourney client data (preferred for tournament mode) — using CountUp for smooth transitions
             const tourneyStats = data.tourney?.clients?.[0]?.beatmap?.stats;
             const beatmapStats = beatmap.stats;
             
             // Stars
-            const starsEl = document.getElementById('sr');
-            if (starsEl) {
-                const stars = tourneyStats?.stars?.total ?? beatmapStats?.stars?.total ?? 0;
-                starsEl.textContent = stars.toFixed(2);
-            }
+            const stars = tourneyStats?.stars?.total ?? beatmapStats?.stars?.total ?? 0;
+            srAni.update(stars);
             
             // BPM
-            const bpmEl = document.getElementById('bpm');
-            if (bpmEl) {
-                const bpmVal = tourneyStats?.bpm?.common ?? beatmapStats?.bpm?.common ?? 0;
-                bpmEl.textContent = bpmVal.toFixed(0);
-            }
+            const bpmVal = tourneyStats?.bpm?.common ?? beatmapStats?.bpm?.common ?? 0;
+            bpmAni.update(bpmVal);
             
             // Length (always use beatmap.time.mp3Length in milliseconds)
-            const lengthEl = document.getElementById('length');
-            if (lengthEl) {
-                const lengthMs = beatmap.time?.mp3Length ?? 0;
-                const seconds = Math.floor(lengthMs / 1000);
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = seconds % 60;
-                lengthEl.textContent = `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
-            }
+            const lengthMs = beatmap.time?.mp3Length ?? 0;
+            lengthAni.update(lengthMs / 1000);
             
             // CS, AR, OD, HP with fallbacks
-            const csEl = document.getElementById('csval');
-            const arEl = document.getElementById('arval');
-            const odEl = document.getElementById('odval');
-            const hpEl = document.getElementById('hpval');
+            const csVal = tourneyStats?.cs?.converted ?? beatmapStats?.cs?.converted ?? 0;
+            const arVal = tourneyStats?.ar?.converted ?? beatmapStats?.ar?.converted ?? 0;
+            const odVal = tourneyStats?.od?.converted ?? beatmapStats?.od?.converted ?? 0;
+            const hpVal = tourneyStats?.hp?.converted ?? beatmapStats?.hp?.converted ?? 0;
             
-            if (csEl) {
-                const csVal = tourneyStats?.cs?.converted ?? beatmapStats?.cs?.converted ?? 0;
-                csEl.textContent = csVal.toFixed(1);
-            }
-            if (arEl) {
-                const arVal = tourneyStats?.ar?.converted ?? beatmapStats?.ar?.converted ?? 0;
-                arEl.textContent = arVal.toFixed(1);
-            }
-            if (odEl) {
-                const odVal = tourneyStats?.od?.converted ?? beatmapStats?.od?.converted ?? 0;
-                odEl.textContent = odVal.toFixed(1);
-            }
-            if (hpEl) {
-                const hpVal = tourneyStats?.hp?.converted ?? beatmapStats?.hp?.converted ?? 0;
-                hpEl.textContent = hpVal.toFixed(1);
-            }
+            cs.update(csVal);
+            ar.update(arVal);
+            od.update(odVal);
+            hp.update(hpVal);
         }
     } catch (error) {
         console.error('Error parsing WebSocket message:', error);

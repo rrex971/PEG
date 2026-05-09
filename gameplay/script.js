@@ -32,6 +32,16 @@ function truncateName(name, maxLen = 32) {
     return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
 }
 
+// Normalize team name for comparison (handles smart quotes, zero-width chars, etc.)
+function normalizeTeamName(name) {
+    if (!name) return '';
+    return name
+        .replace(/[\u201C\u201D\u201E\u201F]/g, '"')  // smart double quotes → straight
+        .replace(/[\u2018\u2019\u201A\u201B]/g, "'")  // smart single quotes → straight
+        .replace(/[\u200B\u200C\u200D\uFEFF]/g, '')   // zero-width chars → remove
+        .trim();
+}
+
 // Helper function to get elements by ID
 const $ = (id) => document.getElementById(id);
 
@@ -104,6 +114,7 @@ const els = {
 // State management
 const state = {
     beatmapId: -1,
+    lastMods: '',
     scoreLeft: 0,
     scoreRight: 0,
     playerLeft: '/ / /',
@@ -203,8 +214,10 @@ async function fetchTeams() {
             const teamsData = await teamsResponse.json();
             
             // Find matching teams in teams.json
-            const team1 = teamsData.teams.find(t => t.name === currentMatch.team1Name);
-            const team2 = teamsData.teams.find(t => t.name === currentMatch.team2Name);
+            const normalizedTeam1Name = normalizeTeamName(currentMatch.team1Name);
+            const normalizedTeam2Name = normalizeTeamName(currentMatch.team2Name);
+            const team1 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam1Name);
+            const team2 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam2Name);
             
             if (team1) {
                 els.teamLeftName.textContent = truncateName(team1.name);
@@ -814,8 +827,9 @@ socket.onmessage = (event) => {
     }
 
     // Beatmap change detection
-    if (state.beatmapId !== beatmap.id) {
+    if (state.beatmapId !== beatmap.id || state.lastMods !== data.play?.mods?.checksum) {
         state.beatmapId = beatmap.id;
+        state.lastMods = data.play?.mods?.checksum;
 
         // Update map info
         els.title.textContent = beatmap.title;
@@ -1073,8 +1087,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const teamsData = await teamsResponse.json();
                 
                 // Find matching teams in teams.json
-                const team1 = teamsData.teams.find(t => t.name === currentMatch.team1Name);
-                const team2 = teamsData.teams.find(t => t.name === currentMatch.team2Name);
+                const normalizedTeam1Name = normalizeTeamName(currentMatch.team1Name);
+                const normalizedTeam2Name = normalizeTeamName(currentMatch.team2Name);
+                const team1 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam1Name);
+                const team2 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam2Name);
                 
                 if (team1) {
                     els.teamLeftName.textContent = truncateName(team1.name);

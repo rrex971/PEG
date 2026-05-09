@@ -11,8 +11,8 @@ const PEGSheets = {
     teams: null,
     
     async fetchSchedule() {
-        // Fetch from "schedules" sheet, range K106:AR113 (schedule data)
-        const range = 'schedules!K106:AR113';
+        // Fetch from "schedules" sheet, range H84:AR91 (schedule data)
+        const range = 'schedules!H84:AR91';
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/${range}?key=${this.SHEETS_API_KEY}`;
         
         try {

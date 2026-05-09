@@ -9,6 +9,16 @@ function truncateName(name, maxLen = 32) {
     return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
 }
 
+// Normalize team name for comparison (handles smart quotes, zero-width chars, etc.)
+function normalizeTeamName(name) {
+    if (!name) return '';
+    return name
+        .replace(/[\u201C\u201D\u201E\u201F]/g, '"')  // smart double quotes → straight
+        .replace(/[\u2018\u2019\u201A\u201B]/g, "'")  // smart single quotes → straight
+        .replace(/[\u200B\u200C\u200D\uFEFF]/g, '')   // zero-width chars → remove
+        .trim();
+}
+
 // Configuration
 let CONFIG = {};
 fetch('../config.json')
@@ -47,10 +57,10 @@ async function initSchedule() {
             const teamsResponse = await fetch('../data/teams.json');
             const teamsData = await teamsResponse.json();
             
-            // Create team logo map
+            // Create team logo map (using normalized team names as keys)
             teamLogoMap = {};
             teamsData.teams.forEach(team => {
-                teamLogoMap[team.name] = `../data/logos/${team.teamId}.png`;
+                teamLogoMap[normalizeTeamName(team.name)] = `../data/logos/${team.teamId}.png`;
             });
         } catch (teamsError) {
             console.error('Error loading teams data:', teamsError);
@@ -223,9 +233,9 @@ function renderNextMatch() {
     const team1 = nextMatch.team1 || 'Team 1';
     const team2 = truncateName(nextMatch.team2 || 'Team 2');
     
-    // Get team logos
-    const logo1 = teamLogoMap[team1] || '';
-    const logo2 = teamLogoMap[nextMatch.team2] || '';
+    // Get team logos (using normalized team names for lookup)
+    const logo1 = teamLogoMap[normalizeTeamName(team1)] || '';
+    const logo2 = teamLogoMap[normalizeTeamName(nextMatch.team2)] || '';
     
     // Format date for display
     const dateDisplay = nextMatch.date ? nextMatch.date.replace(/\(.*?\)\s*/g, '').trim() : '';

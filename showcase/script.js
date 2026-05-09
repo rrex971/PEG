@@ -54,9 +54,9 @@ socket.onmessage = event => {
     const beatmap = data.beatmap;
     const play = data.play;
 
-    if (tempId !== beatmap.id || play.mods.checksum !== tempMods) {
+    if (tempId !== beatmap.id || play?.mods?.checksum !== tempMods) {
         tempId = beatmap.id;
-        tempMods = play.mods.checksum;
+        tempMods = play?.mods?.checksum;
         
         title.innerHTML = beatmap.title;
         artist.innerHTML = beatmap.artist;

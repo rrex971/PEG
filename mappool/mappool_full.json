@@ -1,126 +1,155 @@
 {
-  "round": "ROUND OF 16",
-  "3130258": {
-    "pick": "DT3",
-    "artist": "Syrufit",
-    "title": "Card in the future",
-    "version": "shinjinuke",
-    "creator": "-Tynamo",
-    "bg": "https://assets.ppy.sh/beatmaps/1530375/covers/cover@2x.jpg"
-  },
-  "3180049": {
-    "pick": "NM2",
-    "artist": "Xi",
-    "title": "Native file",
-    "version": "Tribulation from the Native Gods",
-    "creator": "AdveNt",
-    "bg": "https://assets.ppy.sh/beatmaps/1556672/covers/cover@2x.jpg"
-  },
-  "4130938": {
-    "pick": "HD1",
-    "artist": "JANK",
-    "title": "Racecar Bed (Feat. Yung Goth Boi)",
-    "version": "Extra",
-    "creator": "quantumvortex",
-    "bg": "https://assets.ppy.sh/beatmaps/1988508/covers/cover@2x.jpg"
-  },
-  "4450792": {
-    "pick": "HD2",
-    "artist": "fhana",
-    "title": "Anemone No Hana",
-    "version": "Blooming eternal love",
-    "creator": "Azasapag",
-    "bg": "https://assets.ppy.sh/beatmaps/2118889/covers/cover@2x.jpg",
-    "custom": true
-  },
-  "4653719": {
-    "pick": "FM1",
-    "artist": "MisoilePunch ~pan soe~",
-    "title": "MeTear'n TruX",
-    "version": "Resurrection",
-    "creator": "Alvearia",
-    "bg": "https://assets.ppy.sh/beatmaps/2199026/covers/cover@2x.jpg"
-  },
-  "4761556": {
-    "pick": "NM5",
-    "artist": "miyashita yuu",
-    "title": "Lo-Fi Times",
-    "version": "o_PQ0&?_HGgrQPw0hHWq0_11QQ (7.5)",
-    "creator": "aiyoko",
-    "bg": "https://assets.ppy.sh/beatmaps/2119434/covers/cover@2x.jpg"
-  },
-  "4768873": {
-    "pick": "DT1",
-    "artist": "Mano feat. -aoi-",
-    "title": "relative relation (it's all about)",
-    "version": "Twilight",
-    "creator": "Raupain",
-    "bg": "https://assets.ppy.sh/beatmaps/2243445/covers/cover@2x.jpg"
-  },
-  "4819704": {
-    "pick": "NM3",
-    "artist": "Sennzai & Kabocha",
-    "title": "Reveal",
-    "version": "Let The Richly Colored Melody Resound From The Transparent World",
-    "creator": "Plugin",
-    "bg": "https://assets.ppy.sh/beatmaps/2264021/covers/cover@2x.jpg"
-  },
-  "5059931": {
-    "pick": "NM4",
-    "artist": "Eagle",
-    "title": "ICARUS",
-    "version": "ASCENT",
-    "creator": "quantumvortex",
-    "bg": "https://assets.ppy.sh/beatmaps/2351297/covers/cover@2x.jpg"
-  },
-  "5086678": {
-    "pick": "DT2",
-    "artist": "senya",
-    "title": "Kimi to Dareka no Yasashisa ni",
-    "version": "Heartache",
-    "creator": "Cafe_deCoral",
-    "bg": "https://assets.ppy.sh/beatmaps/2360241/covers/cover@2x.jpg"
-  },
-  "5206842": {
-    "pick": "HR2",
-    "artist": "Makina",
-    "title": "Pluton",
-    "version": "Lunatic",
-    "creator": "dogeosu",
-    "bg": "https://assets.ppy.sh/beatmaps/2401198/covers/cover@2x.jpg"
-  },
-  "5465990": {
-    "pick": "TB",
-    "artist": "qrest",
-    "title": "lightbearer (Kyutatsuki's \"photolysis\" Remix)",
-    "version": "Scintilla Aurorae",
-    "creator": "Orkay",
-    "bg": "https://assets.ppy.sh/beatmaps/2488865/covers/cover@2x.jpg"
-  },
-  "5536758": {
+  "round": "QUARTERFINALS",
+  "4474392": {
     "pick": "NM1",
-    "artist": "NIGHTMARE",
-    "title": "cloudy dayz",
-    "version": "Freezing Nightz",
-    "creator": "MrTerror",
-    "bg": "https://assets.ppy.sh/beatmaps/2511915/covers/cover@2x.jpg"
+    "artist": "Araki",
+    "title": "Teo",
+    "version": "EX",
+    "creator": "bag103",
+    "bg": "https://assets.ppy.sh/beatmaps/2128257/covers/cover@2x.jpg"
   },
-  "5636563": {
-    "pick": "FM2",
-    "artist": "QUEENDOM",
-    "title": "Ciki Ciki Bam Bam (TV Size)",
-    "version": "Thirty-Six Stratagems",
-    "creator": "sinn",
-    "bg": "https://assets.ppy.sh/beatmaps/1789962/covers/cover@2x.jpg",
-    "custom": true
+  "3636008": {
+    "pick": "NM2",
+    "artist": "Noah",
+    "title": "Revulsion",
+    "version": "GYGY's Expert",
+    "creator": "R3m",
+    "bg": "https://assets.ppy.sh/beatmaps/1423725/covers/cover@2x.jpg"
   },
-  "5636564": {
+  "4446244": {
+    "pick": "NM3",
+    "artist": "lapix",
+    "title": "Tribal Frontier",
+    "version": "Prey of Cat",
+    "creator": "JeZag",
+    "bg": "https://assets.ppy.sh/beatmaps/2117176/covers/cover@2x.jpg"
+  },
+  "5213660": {
+    "pick": "NM4",
+    "artist": "Akiri",
+    "title": "The Moment You Left Me",
+    "version": "Make You Feel Alive Again",
+    "creator": "ilyuchik",
+    "bg": "https://assets.ppy.sh/beatmaps/2403725/covers/cover@2x.jpg"
+  },
+  "5209722": {
+    "pick": "NM5",
+    "artist": "sekai",
+    "title": "Sefirot",
+    "version": "q (7, 8)",
+    "creator": "sxnshine2020",
+    "bg": "https://assets.ppy.sh/beatmaps/1945928/covers/cover@2x.jpg"
+  },
+  "4950959": {
+    "pick": "HD1",
+    "artist": "Linkin Park",
+    "title": "Given Up",
+    "version": "Sorrow",
+    "creator": "Elzix",
+    "bg": "https://assets.ppy.sh/beatmaps/2313594/covers/cover@2x.jpg"
+  },
+  "5585920": {
+    "pick": "HD2",
+    "artist": "inabakumori",
+    "title": "Harunanshiki",
+    "version": "Spring",
+    "creator": "jykca",
+    "bg": "https://assets.ppy.sh/beatmaps/2528142/covers/cover@2x.jpg"
+  },
+  "4355924": {
+    "pick": "HD3",
+    "artist": "yak_won",
+    "title": "Wind Tales",
+    "version": "Extreme",
+    "creator": "dakiwii",
+    "bg": "https://assets.ppy.sh/beatmaps/2080120/covers/cover@2x.jpg"
+  },
+  "3338283": {
     "pick": "HR1",
-    "artist": "Haraguchi Sasuke",
-    "title": "Cubibibibism",
-    "version": "Czanne? (PEG Edit)",
+    "artist": "mitei",
+    "title": "Phosphor",
+    "version": "captin's Extra",
+    "creator": "Mir",
+    "bg": "https://assets.ppy.sh/beatmaps/1508502/covers/cover@2x.jpg"
+  },
+  "5059757": {
+    "pick": "HR2",
+    "artist": "Lieless",
+    "title": "ASHES",
+    "version": "girltekk",
+    "creator": "girltekk",
+    "bg": "https://assets.ppy.sh/beatmaps/2351232/covers/cover@2x.jpg"
+  },
+  "4758339": {
+    "pick": "HR3",
+    "artist": "meiyo",
+    "title": "STICKER!!!",
+    "version": "Break it down!!!",
+    "creator": "Rtyzen",
+    "bg": "https://assets.ppy.sh/beatmaps/2239141/covers/cover@2x.jpg"
+  },
+  "4445432": {
+    "pick": "DT1",
+    "artist": "IZ*ONE",
+    "title": "Destiny",
+    "version": "Wherever we may be, together we will always be",
+    "creator": "Nabori",
+    "bg": "https://assets.ppy.sh/beatmaps/2116805/covers/cover@2x.jpg"
+  },
+  "5651115": {
+    "pick": "DT2",
+    "artist": "Ice",
+    "title": "L (osu! edit)",
+    "version": "With The Addition Of Hitsounds",
     "creator": "Purl",
-    "bg": "https://assets.ppy.sh/beatmaps/2544872/covers/cover@2x.jpg",
-    "custom": true
+    "bg": "https://assets.ppy.sh/beatmaps/2400429/covers/cover@2x.jpg"
+  },
+  "4959440": {
+    "pick": "DT3",
+    "artist": "Mitchie M",
+    "title": "Suki ! Yuki ! Maji Magic",
+    "version": "Snowy",
+    "creator": "Paka",
+    "bg": "https://assets.ppy.sh/beatmaps/2316401/covers/cover@2x.jpg"
+  },
+  "4761826": {
+    "pick": "DT4",
+    "artist": "onumi, Lil Nas X",
+    "title": "MONTERO (RMX)",
+    "version": "tity & 0pp's Another",
+    "creator": "0ppInOsu",
+    "bg": "https://assets.ppy.sh/beatmaps/2021353/covers/cover@2x.jpg"
+  },
+  "5070643": {
+    "pick": "FM1",
+    "artist": "Adust Rain",
+    "title": "Misery Song",
+    "version": "Judgement of the Sun",
+    "creator": "Liyuu_0109",
+    "bg": "https://assets.ppy.sh/beatmaps/2355024/covers/cover@2x.jpg"
+  },
+  "4329092": {
+    "pick": "FM2",
+    "artist": "Serani Poji",
+    "title": "Spiral Da-Hi! ~P.R.R. Mix~ (Cut Ver.)",
+    "version": "Eternity",
+    "creator": "_xyliac",
+    "bg": "https://assets.ppy.sh/beatmaps/2021556/covers/cover@2x.jpg"
+  },
+  "3826131": {
+    "pick": "FM3",
+    "artist": "M2U & NICODE",
+    "title": "Myosotis (feat. Guriri & Lucy)",
+    "version": "Himei",
+    "creator": "rollpan",
+    "bg": "https://assets.ppy.sh/beatmaps/1861030/covers/cover@2x.jpg"
+  },
+  "5582846": {
+    "pick": "TB",
+    "artist": "Symholic feat. Rina Komatsu",
+    "title": "Veil of Ash",
+    "version": "MatikaneFuKuKodreaMK's Tragic Gay Love",
+    "creator": "AsuKow",
+    "bg": "https://assets.ppy.sh/beatmaps/2527033/covers/cover@2x.jpg"
   }
 }
