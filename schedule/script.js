@@ -66,15 +66,8 @@ async function loadSchedule() {
         // Process matches with status and scores
         const processedMatches = await processMatchesWithScores(data.matches);
         
-        // Filter to only upcoming matches
-        const now = new Date();
-        const upcomingMatches = processedMatches.filter(match => {
-            const dateStr = (match.date || '') + ' ' + (match.time || '');
-            const matchDate = parseToUTC8(dateStr || match.dateTime);
-            return matchDate && matchDate.getTime() > now.getTime();
-        });
-        
-        upcomingMatches.forEach((match) => {
+        // Render all matches (not just upcoming) — each card shows its status
+        processedMatches.forEach((match) => {
             const matchCard = createMatchCard(match);
             matchesGrid.appendChild(matchCard);
         });
