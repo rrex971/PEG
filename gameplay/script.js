@@ -20,7 +20,6 @@ fetch('../config.json')
         CONFIG = {
             bestOf: 9,
             maxBans: 2,
-            maxProtects: 1,
             maxPoints: 4,
             team1Index: 0,
             team2Index: 1,
@@ -67,10 +66,6 @@ const els = {
     teamRightLogo: document.querySelector('#team-right-side .team-logo'),
     teamLeftPicks: $('team-left-picks'),
     teamRightPicks: $('team-right-picks'),
-    playersLeft: $('players-left'),
-    playersRight: $('players-right'),
-    overflowLeft: $('overflow-left'),
-    overflowRight: $('overflow-right'),
 
     // Score bar elements
     scoreBarLeft: $('score-bar-left'),
@@ -122,14 +117,11 @@ const state = {
     lastMods: '',
     scoreLeft: 0,
     scoreRight: 0,
-    playerLeft: '/ / /',
-    playerRight: '\\ \\ \\',
     starsLeft: 0,
     starsRight: 0,
     chatMessages: [],
     lastChatHash: '',
     teams: null,
-    activePlayers: [],
     pickBanLog: []
 };
 
@@ -167,7 +159,7 @@ let mappool = {};
 let customEntries = [];
 
 // Load mappool and separate custom entries
-fetch('../showcase/mappool.json')
+fetch('../data/mappool.json')
     .then(response => response.json())
     .then(data => {
         mappool = data;
@@ -187,26 +179,11 @@ async function fetchTeams() {
     // First check if admin has set a match
     const currentMatch = JSON.parse(localStorage.getItem('peg-current-match') || 'null');
     
-    // Build a username → osuId lookup from the draft API
-    let osuIdLookup = {};
     try {
         const draftResponse = await fetch(`${PROXY_URL}${encodeURIComponent(DRAFT_API)}`);
         const draftData = await draftResponse.json();
         if (draftData.draft && draftData.draft.teams) {
             state.teams = draftData.draft.teams;
-            // Build lookup: username → { osuId, avatarUrl }
-            draftData.draft.teams.forEach(team => {
-                if (team.captain) {
-                    const name = team.captain.username || team.captain.name || '';
-                    if (name) osuIdLookup[name.toLowerCase()] = { osuId: team.captain.osuId || team.captain.id, avatarUrl: team.captain.avatarUrl };
-                }
-                if (team.players) {
-                    team.players.forEach(p => {
-                        const name = p.username || p.name || '';
-                        if (name) osuIdLookup[name.toLowerCase()] = { osuId: p.osuId || p.id, avatarUrl: p.avatarUrl };
-                    });
-                }
-            });
         }
     } catch (e) {
         console.error('Error fetching draft API:', e);
@@ -229,9 +206,6 @@ async function fetchTeams() {
                 if (els.teamLeftLogo && team1.teamId) {
                     els.teamLeftLogo.src = `../data/logos/${team1.teamId}.png`;
                 }
-                // Enrich team1 players with osuIds from draft API
-                enrichTeamWithOsuIds(team1, osuIdLookup);
-                renderTeamSlots('left', team1);
             } else {
                 els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
             }
@@ -240,8 +214,6 @@ async function fetchTeams() {
                 if (els.teamRightLogo && team2.teamId) {
                     els.teamRightLogo.src = `../data/logos/${team2.teamId}.png`;
                 }
-                enrichTeamWithOsuIds(team2, osuIdLookup);
-                renderTeamSlots('right', team2);
             } else {
                 els.teamRightName.textContent = truncateName(currentMatch.team2Name);
             }
@@ -257,106 +229,15 @@ async function fetchTeams() {
         const team2Index = parseInt(urlParams.get('team2')) || CONFIG.team2Index;
 
         if (state.teams[team1Index]) {
-            renderTeamSlots('left', state.teams[team1Index]);
             els.teamLeftName.textContent = truncateName(state.teams[team1Index].name || 'TEAM LEFT');
             updateTeamLogo('left', state.teams[team1Index]);
         }
         if (state.teams[team2Index]) {
-            renderTeamSlots('right', state.teams[team2Index]);
             els.teamRightName.textContent = truncateName(state.teams[team2Index].name);
             updateTeamLogo('right', state.teams[team2Index]);
         }
     }
     
-    // Process benched players after rendering slots
-    updateActivePlayers();
-}
-
-// Enrich team players with osuIds from draft API lookup
-function enrichTeamWithOsuIds(team, osuIdLookup) {
-    if (!team.players || !Array.isArray(team.players)) return;
-    
-    team.players = team.players.map(p => {
-        const name = typeof p === 'string' ? p : (p.username || p.name || '');
-        const lookup = osuIdLookup[name.toLowerCase()];
-        if (lookup) {
-            return { name: name, osuId: lookup.osuId, avatarUrl: lookup.avatarUrl };
-        }
-        return typeof p === 'string' ? { name: p, osuId: '' } : p;
-    });
-}
-
-// Render player slots for a team
-function renderTeamSlots(side, team) {
-    const container = side === 'left' ? els.playersLeft : els.playersRight;
-    const slots = container.querySelectorAll('.player-slot');
-
-    // Build player list from team data
-    // teams.json has: captain (string), players (array of strings)
-    // draft API has: captain (object), players (array of objects)
-    const players = [];
-    
-    if (team.players && Array.isArray(team.players)) {
-        // Use players array as the source of truth (includes captain)
-        team.players.forEach(p => {
-            if (typeof p === 'string') {
-                // teams.json format: just a name string
-                players.push({ name: p, osuId: '' });
-            } else if (p && typeof p === 'object') {
-                // draft API format: object with username/name and osuId
-                players.push({
-                    name: p.username || p.name || '',
-                    osuId: p.osuId || p.id || ''
-                });
-            }
-        });
-    }
-    
-    // If no players array but captain exists, add captain
-    if (players.length === 0 && team.captain) {
-        if (typeof team.captain === 'string') {
-            players.push({ name: team.captain, osuId: '' });
-        } else if (team.captain.username || team.captain.name) {
-            players.push({
-                name: team.captain.username || team.captain.name,
-                osuId: team.captain.osuId || team.captain.id || ''
-            });
-        }
-    }
-
-    // Fill slots with player names and avatars
-    slots.forEach((slot, index) => {
-        const avatarEl = slot.querySelector('.player-avatar');
-        const nameEl = slot.querySelector('.player-name');
-        
-        if (players[index] && players[index].name) {
-            const playerName = players[index].name;
-            const osuId = players[index].osuId;
-            
-            slot.dataset.playerName = playerName;
-            
-            if (nameEl) {
-                nameEl.textContent = playerName;
-            }
-            
-            if (avatarEl && osuId) {
-                avatarEl.src = `https://a.ppy.sh/${osuId}`;
-                avatarEl.alt = playerName;
-            } else if (avatarEl) {
-                avatarEl.src = '';
-                avatarEl.alt = '';
-            }
-        } else {
-            slot.dataset.playerName = '';
-            if (nameEl) {
-                nameEl.textContent = '';
-            }
-            if (avatarEl) {
-                avatarEl.src = '';
-                avatarEl.alt = '';
-            }
-        }
-    });
 }
 
 // Update team logo
@@ -378,65 +259,6 @@ function updateTeamLogo(side, team) {
 }
 
 // Update active player highlighting
-function updateActivePlayers() {
-    const spectatedPlayers = state.activePlayers.map(p => p.toLowerCase());
-    console.log('[Gameplay] Spectated players:', spectatedPlayers);
-
-    // Process left team
-    processBenchedPlayers(els.playersLeft, els.overflowLeft, spectatedPlayers);
-    
-    // Process right team
-    processBenchedPlayers(els.playersRight, els.overflowRight, spectatedPlayers);
-}
-
-function processBenchedPlayers(container, overflowEl, spectatedPlayers) {
-    const slots = container.querySelectorAll('.player-slot');
-    console.log('[Gameplay] Container slots:', slots.length);
-    
-    let totalPlayers = 0;
-    let activeCount = 0;
-    
-    slots.forEach(slot => {
-        if (slot.dataset.playerName) {
-            totalPlayers++;
-            const name = slot.dataset.playerName.toLowerCase();
-            if (spectatedPlayers.some(p => p.toLowerCase() === name)) {
-                activeCount++;
-                slot.classList.add('in-lobby');
-                slot.classList.remove('overflow-hidden');
-            } else {
-                slot.classList.remove('in-lobby');
-            }
-        } else {
-            slot.style.display = 'none';
-        }
-    });
-    
-    const benchedCount = totalPlayers - activeCount;
-    
-    // Show only first 4 benched, hide rest
-    let visibleCount = 0;
-    slots.forEach(slot => {
-        if (slot.dataset.playerName && !slot.classList.contains('in-lobby')) {
-            if (visibleCount < 4) {
-                slot.classList.remove('overflow-hidden');
-                visibleCount++;
-            } else {
-                slot.classList.add('overflow-hidden');
-            }
-        }
-    });
-    
-    // Overflow
-    const overflow = benchedCount - visibleCount;
-    if (overflow > 0) {
-        overflowEl.textContent = `+${overflow}`;
-        overflowEl.style.display = 'inline-flex';
-    } else {
-        overflowEl.style.display = 'none';
-    }
-}
-
 // Update scorebar with progressive fill from center
 function updateScorebar() {
     const leftRaw = state.scoreLeft || 0;
@@ -565,19 +387,6 @@ function renderTeamBlock(teamData, side) {
         block.appendChild(bans);
     }
     
-    // Protects
-    if (CONFIG.maxProtects > 0) {
-        const protects = document.createElement('div');
-        protects.className = 'team-protects';
-        for (let i = 0; i < CONFIG.maxProtects; i++) {
-            const badge = document.createElement('div');
-            badge.className = 'protect-badge';
-            badge.textContent = '—'; // placeholder
-            protects.appendChild(badge);
-        }
-        block.appendChild(protects);
-    }
-    
     return block;
 }
 
@@ -605,8 +414,7 @@ function updatePickLog() {
             const item = document.createElement('div');
             // Map action values to CSS class names
             const actionClass = pick.action === 'picked' ? 'pick' :
-                               pick.action === 'banned' ? 'ban' :
-                               pick.action === 'protected' ? 'protect' : pick.action;
+                               pick.action === 'banned' ? 'ban' : pick.action;
             // Map player to team class
             const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
             
@@ -621,7 +429,6 @@ function updatePickLog() {
             let prefix = '';
             if (pick.action === 'picked') prefix = 'PICK:';
             else if (pick.action === 'banned') prefix = 'BAN:';
-            else if (pick.action === 'protected') prefix = 'PROT:';
             
             item.textContent = `${prefix} ${pick.pick}`;
             container.appendChild(item);
@@ -650,8 +457,7 @@ function updatePickLog() {
             const item = document.createElement('div');
             // Map action values to CSS class names
             const actionClass = pick.action === 'picked' ? 'pick' :
-                               pick.action === 'banned' ? 'ban' :
-                               pick.action === 'protected' ? 'protect' : pick.action;
+                               pick.action === 'banned' ? 'ban' : pick.action;
             // Map player to team class
             const teamClass = pick.player === 1 ? 'team-left' : 'team-right';
             
@@ -666,7 +472,6 @@ function updatePickLog() {
             let prefix = '';
             if (pick.action === 'picked') prefix = 'PICK:';
             else if (pick.action === 'banned') prefix = 'BAN:';
-            else if (pick.action === 'protected') prefix = 'PROT:';
             
             item.textContent = `${prefix} ${pick.pick}`;
             container.appendChild(item);
@@ -698,7 +503,6 @@ function updateTeamPicks(side) {
     picksEl.innerHTML = '';
     
     const bans = state.pickBanLog.filter(p => p.action === 'banned' && p.player === (side === 'left' ? 1 : 2));
-    const protects = state.pickBanLog.filter(p => p.action === 'protected' && p.player === (side === 'left' ? 1 : 2));
     
     const isLeft = side === 'left';
     
@@ -743,46 +547,6 @@ function updateTeamPicks(side) {
         picksEl.appendChild(banRow);
     }
     
-    // Protects row
-    if (CONFIG.maxProtects > 0) {
-        const protRow = document.createElement('div');
-        protRow.className = 'picks-row';
-        
-        const protLabel = document.createElement('span');
-        protLabel.className = 'picks-label';
-        protLabel.textContent = 'PROT';
-        
-        const protSlots = document.createElement('div');
-        protSlots.className = 'picks-slots';
-        
-        const protSlotsArray = [];
-        for (let i = 0; i < CONFIG.maxProtects; i++) {
-            const tag = document.createElement('span');
-            tag.className = `pick-tag protect team-${side}`;
-            // For right team, protects fill from the end
-            const protIndex = isLeft ? i : (CONFIG.maxProtects - 1 - i);
-            if (protects[protIndex]) {
-                tag.textContent = protects[protIndex].map || protects[protIndex].pick || '';
-            } else {
-                tag.textContent = '—';
-                tag.classList.add('empty');
-            }
-            protSlotsArray.push(tag);
-        }
-        
-        // For right team, reverse so filled slots are on the right
-        if (!isLeft) protSlotsArray.reverse();
-        protSlotsArray.forEach(tag => protSlots.appendChild(tag));
-        
-        if (isLeft) {
-            protRow.appendChild(protLabel);
-            protRow.appendChild(protSlots);
-        } else {
-            protRow.appendChild(protSlots);
-            protRow.appendChild(protLabel);
-        }
-        picksEl.appendChild(protRow);
-    }
 }
 
 // Render points dots dynamically based on CONFIG.bestOf
@@ -942,23 +706,6 @@ socket.onmessage = (event) => {
         }
     }
 
-    // Update player names - check ALL clients, not just first 2
-    if (data.tourney?.clients) {
-        const clientNames = data.tourney.clients.map(c => c.user?.name).filter(Boolean);
-        const newPlayerLeft = data.tourney.clients[0]?.user?.name;
-        const newPlayerRight = data.tourney.clients[1]?.user?.name;
-        
-        if (state.playerLeft !== newPlayerLeft || state.playerRight !== newPlayerRight) {
-            state.playerLeft = newPlayerLeft;
-            state.playerRight = newPlayerRight;
-            
-            // Update active players list with ALL clients
-            state.activePlayers = clientNames;
-            console.log('[Gameplay] Active players (all clients):', state.activePlayers);
-            updateActivePlayers();
-        }
-    }
-
     // Update match points (filled dots and numbers)
     if (data.tourney?.points) {
         const newStarsLeft = data.tourney.points.left || 0;
@@ -974,9 +721,6 @@ socket.onmessage = (event) => {
     // Update ingame chat
     updateChat(data);
     
-    // Always update benched players on every message
-    console.log('[Gameplay] Active players (always update):', state.activePlayers);
-    updateActivePlayers();
 };
 
 // Update chat messages from tosu WebSocket
@@ -1037,10 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (DEBUG) console.log('PEG Gameplay Overlay loaded');
 
     // Fetch team data on load
-    fetchTeams().then(() => {
-        // Process benched players after team data loads
-        updateActivePlayers();
-    });
+    fetchTeams();
 
     // Poll for pick/ban log changes every 500ms
     setInterval(updatePickLog, 500);
@@ -1060,29 +801,6 @@ document.addEventListener('DOMContentLoaded', () => {
             els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
             els.teamRightName.textContent = truncateName(currentMatch.team2Name);
             
-            // Build osuId lookup from draft API
-            let osuIdLookup = {};
-            try {
-                const draftResponse = await fetch(`${PROXY_URL}${encodeURIComponent(DRAFT_API)}`);
-                const draftData = await draftResponse.json();
-                if (draftData.draft && draftData.draft.teams) {
-                    draftData.draft.teams.forEach(team => {
-                        if (team.captain) {
-                            const name = team.captain.username || team.captain.name || '';
-                            if (name) osuIdLookup[name.toLowerCase()] = { osuId: team.captain.osuId || team.captain.id, avatarUrl: team.captain.avatarUrl };
-                        }
-                        if (team.players) {
-                            team.players.forEach(p => {
-                                const name = p.username || p.name || '';
-                                if (name) osuIdLookup[name.toLowerCase()] = { osuId: p.osuId || p.id, avatarUrl: p.avatarUrl };
-                            });
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Error fetching draft API:', e);
-            }
-            
             // Load teams.json to get logos and player lists
             try {
                 const teamsResponse = await fetch('../data/teams.json');
@@ -1099,20 +817,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (els.teamLeftLogo && team1.teamId) {
                         els.teamLeftLogo.src = `../data/logos/${team1.teamId}.png`;
                     }
-                    enrichTeamWithOsuIds(team1, osuIdLookup);
-                    renderTeamSlots('left', team1);
                 }
                 if (team2) {
                     els.teamRightName.textContent = truncateName(team2.name);
                     if (els.teamRightLogo && team2.teamId) {
                         els.teamRightLogo.src = `../data/logos/${team2.teamId}.png`;
                     }
-                    enrichTeamWithOsuIds(team2, osuIdLookup);
-                    renderTeamSlots('right', team2);
                 }
                 
-                // Update active players after team data loads
-                updateActivePlayers();
             } catch (error) {
                 console.error('Error loading teams.json during poll:', error);
             }

@@ -1,5 +1,3 @@
-// PEG Google Sheets API Integration
-// Fetches schedule and team data directly from Google Sheets API v4
 
 const SHEETS_API_KEY = 'AIzaSyDyGykbUrhCxV4ZDCtDyWk4Wg0xzzcHzTo';
 const SPREADSHEET_ID = '1LmmhkHvVtr1aI6cgC8U3IvfIz4QvJBaqxzlcJSbO1to';
@@ -11,8 +9,8 @@ const PEGSheets = {
     teams: null,
     
     async fetchSchedule() {
-        // Fetch from "schedules" sheet, range H84:AR91 (schedule data)
-        const range = 'schedules!H84:AR91';
+        // Fetch from "schedules" sheet, range H54:AW69 (schedule data)
+        const range = 'schedules!H54:AW69';
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/${range}?key=${this.SHEETS_API_KEY}`;
         
         try {
@@ -48,13 +46,6 @@ const PEGSheets = {
                 }
             }
             
-            // Parse matches from H84:AR91 range
-            // Column mapping in this range (0-based from H):
-            // Column 3 (K): Match ID
-            // Column 4 (L): Date like "(Sat) May 2"
-            // Column 5 (M): Time like "9:30PM"
-            // Column 19 (AA): Team 1 name
-            // Last column (AR): Team 2 name
             let matchesFound = 0;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
@@ -65,14 +56,18 @@ const PEGSheets = {
                 }
                 
                 // Try to find match data in this row
-                // Look for date in column 4 (L) as an indicator of match data
-                const date = row.length > 4 ? String(row[4]).trim() : '';
-                const time = row.length > 5 ? String(row[5]).trim() : '';
+                // Look for combined date+time in column 3 (K) as an indicator
+                const dateTimeCell = row.length > 3 ? String(row[3]).trim() : '';
                 
-                // Only process rows that have a date (indicating match data)
-                if (date && date.length > 2) {
-                    // Extract match ID from column 3 (K)
-                    const matchId = row.length > 3 ? String(row[3]).trim() : '';
+                // Only process rows that have a combined DATE @ TIME cell
+                if (dateTimeCell && dateTimeCell.includes('@')) {
+                    // Match ID is in column 0 (H)
+                    const matchId = row.length > 0 ? String(row[0]).trim() : '';
+                    
+                    // Split combined date+time on @
+                    const parts = dateTimeCell.split('@');
+                    const date = parts[0] ? parts[0].trim() : '';
+                    const time = parts[1] ? parts[1].trim() : '';
                     
                     // Extract team names from columns 19 (AA) and last column (AR)
                     // Team 1 is in column 19 (AA)
@@ -82,6 +77,8 @@ const PEGSheets = {
                     const team2 = row.length > 0 ? String(row[row.length - 1]).trim() : '';
                     
                     // Only add if we have valid team names
+                    // Bracket-style references like "W17", "W18" (winner of match X)
+                    // and sub-match IDs like "21P1", "21P2" are kept as-is
                     if (team1 && team2 && team1.length > 2 && team2.length > 2) {
                         scheduleData.matches.push({
                             matchId: matchId,

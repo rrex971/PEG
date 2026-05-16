@@ -1,19 +1,122 @@
 // PEG Mappool Overlay Script
 
+// Configuration object for easy customization
+let CONFIG = {};
+fetch('../config.json')
+    .then(r => r.json())
+    .then(cfg => {
+        Object.assign(CONFIG, cfg);
+        renderPointsDots();
+    })
+    .catch(err => {
+        console.warn('Config load failed, using defaults:', err);
+        CONFIG = {
+            bestOf: 9,
+            maxBans: 2,
+            maxPoints: 4,
+            team1Index: 0,
+            team2Index: 1,
+            maxPicks: 5,
+            pickTimer: 30,
+            banTimer: 30
+        };
+        renderPointsDots();
+    });
+
 // Truncate team name to max length with ellipsis
 function truncateName(name, maxLen = 32) {
     if (!name) return '';
     return name.length > maxLen ? name.substring(0, maxLen) + '…' : name;
 }
 
+// Normalize team name for comparison (handles smart quotes, zero-width chars, etc.)
+function normalizeTeamName(name) {
+    if (!name) return '';
+    return name
+        .replace(/[\u201C\u201D\u201E\u201F]/g, '"')  // smart double quotes → straight
+        .replace(/[\u2018\u2019\u201A\u201B]/g, "'")  // smart single quotes → straight
+        .replace(/[\u200B\u200C\u200D\uFEFF]/g, '')   // zero-width chars → remove
+        .trim();
+}
+
 // Helper function for element selection
 const $ = (id) => document.getElementById(id);
 
-// Global state
-let currentMappool = null;
-let lastMappoolHash = '';
-let lastPicksState = {};
-let customEntries = [];
+// Cache all DOM elements
+const els = {
+    // Header
+    logo: $('logo'),
+    round: $('round'),
+
+    // Maps container
+    maps: $('maps'),
+
+    // Team info
+    teamLeftName: $('team-left-name'),
+    teamRightName: $('team-right-name'),
+    teamLeftLogo: document.querySelector('#team-left-side .team-logo'),
+    teamRightLogo: document.querySelector('#team-right-side .team-logo'),
+    teamLeftPicks: $('team-left-picks'),
+    teamRightPicks: $('team-right-picks'),
+
+    // Score bar elements
+    scoreBarLeft: $('score-bar-left'),
+    scoreBarRight: $('score-bar-right'),
+
+    // Map info panel
+    pickBadge: $('pick-badge'),
+    title: $('title'),
+    artist: $('artist'),
+    difficulty: $('difficulty'),
+    mapper: $('mapper'),
+
+    // Stats
+    sr: $('sr'),
+    bpm: $('bpm'),
+    length: $('length'),
+    csval: $('csval'),
+    arval: $('arval'),
+    odval: $('odval'),
+    hpval: $('hpval'),
+
+    // Score display
+    scoreLeft: $('score-left'),
+    scoreRight: $('score-right'),
+    scoreDiff: $('score-diff'),
+
+    // Points (match points)
+    pointsLeftDots: $('points-left-dots'),
+    pointsRightDots: $('points-right-dots'),
+    pointsNumberLeft: $('points-number-left'),
+    pointsNumberRight: $('points-number-right'),
+    vsPill: $('vs-pill'),
+
+    // Team blocks
+    teamLeftSide: $('team-left-side'),
+    teamRightSide: $('team-right-side'),
+
+    // Pick/Ban log
+    pickLogItems: $('pick-log-items'),
+
+    // Chat
+    chatMessages: $('chat-messages'),
+    castersList: $('casters-list')
+};
+
+// State management
+const state = {
+    beatmapId: -1,
+    lastMods: '',
+    scoreLeft: 0,
+    scoreRight: 0,
+    starsLeft: 0,
+    starsRight: 0,
+    chatMessages: [],
+    lastChatHash: '',
+    teams: null,
+    pickBanLog: [],
+    currentMatch: null
+};
 
 // CountUp formatters
 const timeFormatter = (value) => {
@@ -39,6 +142,15 @@ const od = new CountUp("odval", 0, 0, 2, duration, { useEasing: true, useGroupin
 const hp = new CountUp("hpval", 0, 0, 2, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
 const bpmAni = new CountUp("bpm", 0, 0, 2, duration, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
 const srAni = new CountUp("sr", 0, 0, 2, 0.3, { useEasing: true, useGrouping: false, separator: '', formattingFn: smartDecimalFormatter });
+const scoreLeftCountUp = new CountUp("score-left", 0, 0, 0, 0.5, { useEasing: true, useGrouping: true, separator: ',', decimal: '.', suffix: '' });
+const scoreRightCountUp = new CountUp("score-right", 0, 0, 0, 0.5, { useEasing: true, useGrouping: true, separator: ',', decimal: '.', suffix: '' });
+const scoreDiffCountUp = new CountUp("score-diff", 0, 0, 0, 0.5, { useEasing: true, useGrouping: true, separator: ',', decimal: '.', suffix: '' });
+
+// Global state for mappool
+let currentMappool = null;
+let lastMappoolHash = '';
+let lastPicksState = {};
+let customEntries = [];
 
 // Mappool loading and rendering
 async function loadMappool() {
@@ -46,7 +158,7 @@ async function loadMappool() {
     const roundDisplay = $('round');
     
     try {
-        const response = await fetch('mappool_full.json');
+        const response = await fetch('../data/mappool_full.json');
         if (!response.ok) {
             throw new Error(`HTTP error ${response.status}`);
         }
@@ -197,6 +309,7 @@ function createMapCard(beatmapId, mapData) {
     mapDetailsElement.appendChild(mapMapperElement);
     
     
+    
 
     
     // Assemble the card
@@ -236,7 +349,7 @@ function handleMapClick(mapElement, event) {
     const pickId = mapElement.dataset.pickId;
     const mapData = mapElement.mapData;
     
-    // Ctrl+click = clear any pick/ban/protect on this map
+    // Ctrl+click = clear any pick/ban on this map
     if (isCtrl) {
         clearMapAction(mapElement, pickId, beatmapId);
         return;
@@ -262,7 +375,7 @@ function handleMapClick(mapElement, event) {
 
 function clearMapAction(card, pickId, beatmapId) {
     // Remove visual states
-    card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2', 'protected', 'flash');
+    card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2', 'flash');
     const label = card.querySelector('.map-status-label');
     if (label) label.remove();
     
@@ -311,7 +424,7 @@ function applyMapAction(card, action, player, pickId, beatmapId) {
     }
     
     // Remove old status classes
-    card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2', 'protected');
+    card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2');
     const oldLabel = card.querySelector('.map-status-label');
     if (oldLabel) oldLabel.remove();
     
@@ -320,8 +433,6 @@ function applyMapAction(card, action, player, pickId, beatmapId) {
         card.classList.add(`picked-by-${player}`);
     } else if (action === 'banned') {
         card.classList.add(`banned-by-${player}`);
-    } else if (action === 'protected') {
-        card.classList.add('protected');
     }
     
     // Add status label
@@ -331,11 +442,9 @@ function applyMapAction(card, action, player, pickId, beatmapId) {
         labelClass += ` picked-by-${player}`;
     } else if (action === 'banned') {
         labelClass += ' banned';
-    } else if (action === 'protected') {
-        labelClass += ' protected';
     }
     label.className = labelClass;
-    label.textContent = `${action === 'picked' ? 'PICKED' : action === 'banned' ? 'BANNED' : 'PROTECTED'} BY ${teamName}`;
+    label.textContent = `${action === 'picked' ? 'PICKED' : 'BANNED'} BY ${teamName}`;
     card.appendChild(label);
     
     // Save to localStorage
@@ -362,6 +471,253 @@ const socket = new ReconnectingWebSocket(`ws://${HOST}/websocket/v2`);
 let currentMapId = null;
 let lastMods = '';
 
+// Fetch team data from draft API
+const PROXY_URL = 'https://corsproxy.io/?';
+const DRAFT_API = 'https://purlextragaza-api.vercel.app/api/draft';
+
+async function fetchTeams() {
+    // First check if admin has set a match
+    const currentMatch = JSON.parse(localStorage.getItem('peg-current-match') || 'null');
+    
+    try {
+        const draftResponse = await fetch(`${PROXY_URL}${encodeURIComponent(DRAFT_API)}`);
+        const draftData = await draftResponse.json();
+        if (draftData.draft && draftData.draft.teams) {
+            state.teams = draftData.draft.teams;
+        }
+    } catch (e) {
+        console.error('Error fetching draft API:', e);
+    }
+    
+    if (currentMatch) {
+        // Load teams.json to get logos and player lists
+        try {
+            const teamsResponse = await fetch('../data/teams.json');
+            const teamsData = await teamsResponse.json();
+            
+            // Find matching teams in teams.json
+            const normalizedTeam1Name = normalizeTeamName(currentMatch.team1Name);
+            const normalizedTeam2Name = normalizeTeamName(currentMatch.team2Name);
+            const team1 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam1Name);
+            const team2 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam2Name);
+            
+            if (team1) {
+                els.teamLeftName.textContent = truncateName(team1.name);
+                if (els.teamLeftLogo && team1.teamId) {
+                    els.teamLeftLogo.src = `../data/logos/${team1.teamId}.png`;
+                }
+            } else {
+                els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
+            }
+            if (team2) {
+                els.teamRightName.textContent = truncateName(team2.name);
+                if (els.teamRightLogo && team2.teamId) {
+                    els.teamRightLogo.src = `../data/logos/${team2.teamId}.png`;
+                }
+            } else {
+                els.teamRightName.textContent = truncateName(currentMatch.team2Name);
+            }
+        } catch (error) {
+            console.error('Error loading teams.json:', error);
+            els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
+            els.teamRightName.textContent = truncateName(currentMatch.team2Name);
+        }
+    } else if (state.teams && state.teams.length > 0) {
+        // No admin match set — use draft API teams directly
+        const urlParams = new URLSearchParams(window.location.search);
+        const team1Index = parseInt(urlParams.get('team1')) || CONFIG.team1Index;
+        const team2Index = parseInt(urlParams.get('team2')) || CONFIG.team2Index;
+
+        if (state.teams[team1Index]) {
+            els.teamLeftName.textContent = truncateName(state.teams[team1Index].name || 'TEAM LEFT');
+            updateTeamLogo('left', state.teams[team1Index]);
+        }
+        if (state.teams[team2Index]) {
+            els.teamRightName.textContent = truncateName(state.teams[team2Index].name);
+            updateTeamLogo('right', state.teams[team2Index]);
+        }
+    }
+    
+}
+
+// Update team logo
+function updateTeamLogo(side, team) {
+    const logoEl = side === 'left' ? els.teamLeftLogo : els.teamRightLogo;
+    if (!logoEl) return;
+    
+    const teamId = team.teamId || team.id || team.team_id;
+    
+    if (teamId) {
+        logoEl.src = `../data/logos/${teamId}.png`;
+        logoEl.alt = team.name || '';
+    } else {
+        logoEl.src = '';
+        logoEl.alt = '';
+    }
+}
+
+// Update active player highlighting
+// Update scorebar with progressive fill from center
+function updateScorebar() {
+    const leftRaw = state.scoreLeft || 0;
+    const rightRaw = state.scoreRight || 0;
+    const differ = leftRaw - rightRaw;
+    const absDiffer = Math.abs(differ);
+    const lowerRaw = Math.min(leftRaw, rightRaw);
+    
+    let percent;
+    if (lowerRaw === 0) {
+        percent = absDiffer === 0 ? 0 : 100;
+    } else {
+        percent = Math.min((absDiffer / lowerRaw) * 100, 100);
+    }
+    
+    if (differ > 0) {
+        els.scoreBarLeft.style.width = percent + '%';
+        els.scoreBarRight.style.width = '0%';
+    } else if (differ < 0) {
+        els.scoreBarRight.style.width = percent + '%';
+        els.scoreBarLeft.style.width = '0%';
+    } else {
+        els.scoreBarLeft.style.width = '0%';
+        els.scoreBarRight.style.width = '0%';
+    }
+}
+
+// Update gradient pill based on points
+function updatePill() {
+    const leftPoints = state.starsLeft || 0;
+    const rightPoints = state.starsRight || 0;
+    const total = leftPoints + rightPoints;
+    
+    let midpoint;
+    if (total === 0) {
+        midpoint = 50;
+    } else {
+        midpoint = (leftPoints / total) * 100;
+    }
+    
+    // Smooth gradient with shifted midpoint
+    const transitionWidth = 20;
+    const start = Math.max(0, midpoint - transitionWidth / 2);
+    const end = Math.min(100, midpoint + transitionWidth / 2);
+    
+    els.vsPill.style.background = `linear-gradient(to right, #face68 ${start}%, #fa6868 ${end}%)`;
+}
+
+// Update points dots and numbers
+function updatePoints() {
+    const leftPoints = state.starsLeft || 0;
+    const rightPoints = state.starsRight || 0;
+    const maxPoints = CONFIG.maxPoints || (Math.floor((CONFIG.bestOf || 9) / 2) + 1);
+    
+    // Update left dots
+    for (let i = 0; i < maxPoints; i++) {
+        const dot = document.getElementById(`point-left-${i}`);
+        if (dot) {
+            if (i < leftPoints) {
+                dot.classList.add('filled');
+            } else {
+                dot.classList.remove('filled');
+            }
+        }
+    }
+    
+    // Update right dots
+    for (let i = 0; i < maxPoints; i++) {
+        const dot = document.getElementById(`point-right-${i}`);
+        if (dot) {
+            if (i < rightPoints) {
+                dot.classList.add('filled');
+            } else {
+                dot.classList.remove('filled');
+            }
+        }
+    }
+    
+    // Update numeric points
+    els.pointsNumberLeft.textContent = leftPoints;
+    els.pointsNumberRight.textContent = rightPoints;
+    
+    // Update pill gradient
+    updatePill();
+}
+
+// Render points dots dynamically based on CONFIG.bestOf
+function renderPointsDots() {
+    const maxPoints = CONFIG.maxPoints || (Math.floor((CONFIG.bestOf || 9) / 2) + 1);
+    
+    // Clear existing dots
+    els.pointsLeftDots.innerHTML = '';
+    els.pointsRightDots.innerHTML = '';
+    
+    // Create dots
+    for (let i = 0; i < maxPoints; i++) {
+        const leftDot = document.createElement('div');
+        leftDot.className = 'match-point';
+        leftDot.id = `point-left-${maxPoints - i - 1}`;
+        els.pointsLeftDots.appendChild(leftDot);
+        
+        const rightDot = document.createElement('div');
+        rightDot.className = 'match-point';
+        rightDot.id = `point-right-${i}`;
+        els.pointsRightDots.appendChild(rightDot);
+    }
+}
+
+// Update team picks/bans display below team name (from pick log)
+function updateTeamPicks(side) {
+    const picksEl = side === 'left' ? els.teamLeftPicks : els.teamRightPicks;
+    if (!picksEl) return;
+    
+    picksEl.innerHTML = '';
+    
+    const bans = state.pickBanLog.filter(p => p.action === 'banned' && p.player === (side === 'left' ? 1 : 2));
+    
+    const isLeft = side === 'left';
+    
+    // Bans row
+    if (CONFIG.maxBans > 0) {
+        const banRow = document.createElement('div');
+        banRow.className = 'picks-row';
+        
+        const banLabel = document.createElement('span');
+        banLabel.className = 'picks-label';
+        banLabel.textContent = 'BANS';
+        
+        const banSlots = document.createElement('div');
+        banSlots.className = 'picks-slots';
+        
+        const banSlotsArray = [];
+        for (let i = 0; i < CONFIG.maxBans; i++) {
+            const tag = document.createElement('span');
+            tag.className = `pick-tag ban team-${side}`;
+            const banIndex = isLeft ? i : (CONFIG.maxBans - 1 - i);
+            if (bans[banIndex]) {
+                tag.textContent = bans[banIndex].map || bans[banIndex].pick || '';
+            } else {
+                tag.textContent = '—';
+                tag.classList.add('empty');
+            }
+            banSlotsArray.push(tag);
+        }
+        
+        if (!isLeft) banSlotsArray.reverse();
+        banSlotsArray.forEach(tag => banSlots.appendChild(tag));
+        
+        if (isLeft) {
+            banRow.appendChild(banLabel);
+            banRow.appendChild(banSlots);
+        } else {
+            banRow.appendChild(banSlots);
+            banRow.appendChild(banLabel);
+        }
+        picksEl.appendChild(banRow);
+    }
+    
+}
+
+// WebSocket event handlers
 socket.onopen = () => {
     console.log('Successfully connected to tosu WebSocket');
 };
@@ -377,6 +733,9 @@ socket.onerror = (error) => {
 socket.onmessage = (event) => {
     try {
         const data = JSON.parse(event.data);
+        const beatmap = data.beatmap;
+        
+        // === Mappool-specific: current map highlighting ===
         
         // Check if beatmap or mods changed
         if (data.beatmap && (data.beatmap.id !== currentMapId || data.play?.mods?.checksum !== lastMods)) {
@@ -404,7 +763,6 @@ socket.onmessage = (event) => {
             }
             
             // Update map info panel (title, artist, difficulty, mapper, pick badge, stats)
-            const beatmap = data.beatmap;
             
             // Update basic map info
             const titleEl = document.getElementById('title');
@@ -432,14 +790,11 @@ socket.onmessage = (event) => {
                 const mapEntry = currentMappool[beatmap.id];
                 if (mapEntry) {
                     if (typeof mapEntry === 'string') {
-                        // Standard map entry (string value from showcase/mappool.json)
                         if (pickBadgeEl) pickBadgeEl.textContent = mapEntry;
                     } else {
-                        // Object entry (mappool_full.json format)
                         if (pickBadgeEl) pickBadgeEl.textContent = mapEntry.pick || 'N/A';
                     }
                 } else {
-                    // Try custom entries: match by title containing the custom pick string
                     const customMatch = customEntries.find(entry => beatmap.title && beatmap.title.includes(entry.key));
                     if (customMatch) {
                         if (pickBadgeEl) pickBadgeEl.textContent = customMatch.pick;
@@ -449,7 +804,7 @@ socket.onmessage = (event) => {
                 }
             }
             
-            // Update stats using tourney client data (preferred for tournament mode) — using CountUp for smooth transitions
+            // Update stats using tourney client data
             const tourneyStats = data.tourney?.clients?.[0]?.beatmap?.stats;
             const beatmapStats = beatmap.stats;
             
@@ -461,11 +816,11 @@ socket.onmessage = (event) => {
             const bpmVal = tourneyStats?.bpm?.common ?? beatmapStats?.bpm?.common ?? 0;
             bpmAni.update(bpmVal);
             
-            // Length (always use beatmap.time.mp3Length in milliseconds)
+            // Length
             const lengthMs = beatmap.time?.mp3Length ?? 0;
             lengthAni.update(lengthMs / 1000);
             
-            // CS, AR, OD, HP with fallbacks
+            // CS, AR, OD, HP
             const csVal = tourneyStats?.cs?.converted ?? beatmapStats?.cs?.converted ?? 0;
             const arVal = tourneyStats?.ar?.converted ?? beatmapStats?.ar?.converted ?? 0;
             const odVal = tourneyStats?.od?.converted ?? beatmapStats?.od?.converted ?? 0;
@@ -476,11 +831,105 @@ socket.onmessage = (event) => {
             od.update(odVal);
             hp.update(hpVal);
         }
+        
+        // === Team/Points updates (same as gameplay) ===
+        
+        // Update scores
+        if (data.tourney?.totalScore) {
+            const newScoreLeft = data.tourney.totalScore.left || 0;
+            const newScoreRight = data.tourney.totalScore.right || 0;
+
+            if (state.scoreLeft !== newScoreLeft || state.scoreRight !== newScoreRight) {
+                state.scoreLeft = newScoreLeft;
+                state.scoreRight = newScoreRight;
+
+                scoreLeftCountUp.update(newScoreLeft);
+                scoreRightCountUp.update(newScoreRight);
+
+                const differ = newScoreLeft - newScoreRight;
+                const absDiffer = Math.abs(differ);
+                scoreDiffCountUp.update(absDiffer);
+
+                updateScorebar();
+
+                if (newScoreLeft > newScoreRight) {
+                    els.scoreLeft.classList.add('leading');
+                    els.scoreRight.classList.remove('leading');
+                } else if (newScoreRight > newScoreLeft) {
+                    els.scoreRight.classList.add('leading');
+                    els.scoreLeft.classList.remove('leading');
+                } else {
+                    els.scoreLeft.classList.remove('leading');
+                    els.scoreRight.classList.remove('leading');
+                }
+            }
+        }
+
+        // Update match points
+        if (data.tourney?.points) {
+            const newStarsLeft = data.tourney.points.left || 0;
+            const newStarsRight = data.tourney.points.right || 0;
+
+            if (state.starsLeft !== newStarsLeft || state.starsRight !== newStarsRight) {
+                state.starsLeft = newStarsLeft;
+                state.starsRight = newStarsRight;
+                updatePoints();
+            }
+        }
+
+        // Update ingame chat
+        updateChat(data);
+
     } catch (error) {
         console.error('Error parsing WebSocket message:', error);
     }
-    };
+};
 
+
+// Update chat messages from tosu WebSocket
+function updateChat(data) {
+    const messages = data.tourney?.chat || data.tourney?.manager?.chat || [];
+
+    if (messages.length === 0) return;
+
+    const chatHash = JSON.stringify(messages.slice(-8));
+
+    if (chatHash !== state.lastChatHash) {
+        state.lastChatHash = chatHash;
+
+        els.chatMessages.innerHTML = '';
+
+        const recentMessages = messages.slice(-8);
+
+        recentMessages.forEach((msg) => {
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('chat-message');
+
+            let teamClass = 'unknown';
+            if (msg.team === 'left') {
+                teamClass = 'left';
+            } else if (msg.team === 'right') {
+                teamClass = 'right';
+            } else if (msg.team === 'bot') {
+                teamClass = 'bot';
+            }
+
+            const nameEl = document.createElement('span');
+            nameEl.classList.add('chat-name', teamClass);
+            nameEl.textContent = msg.name + ':';
+
+            const textEl = document.createElement('span');
+            textEl.classList.add('chat-text');
+            textEl.textContent = msg.message;
+
+            messageEl.appendChild(nameEl);
+            messageEl.appendChild(textEl);
+            els.chatMessages.appendChild(messageEl);
+        });
+
+        els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
+    }
+}
 
 // Prevent default browser behaviors
 document.addEventListener('contextmenu', function (event) {
@@ -529,8 +978,7 @@ function updatePicksDisplay() {
             const item = document.createElement('div');
             // Map action values to CSS class names
             const actionClass = pick.action === 'picked' ? 'pick' :
-                               pick.action === 'banned' ? 'ban' :
-                               pick.action === 'protected' ? 'protect' : pick.action;
+                               pick.action === 'banned' ? 'ban' : pick.action;
             
             // Check if this is a tiebreaker
             const isTiebreaker = (pick.pick || '').startsWith('TB');
@@ -549,7 +997,6 @@ function updatePicksDisplay() {
             let prefix = '';
             if (pick.action === 'picked') prefix = 'PICK:';
             else if (pick.action === 'banned') prefix = 'BAN:';
-            else if (pick.action === 'protected') prefix = 'PROT:';
             
             item.textContent = `${prefix} ${pick.pick}`;
             container.appendChild(item);
@@ -578,8 +1025,7 @@ function updatePicksDisplay() {
             const item = document.createElement('div');
             // Map action values to CSS class names
             const actionClass = pick.action === 'picked' ? 'pick' :
-                               pick.action === 'banned' ? 'ban' :
-                               pick.action === 'protected' ? 'protect' : pick.action;
+                               pick.action === 'banned' ? 'ban' : pick.action;
             
             // Check if this is a tiebreaker
             const isTiebreaker = (pick.pick || '').startsWith('TB');
@@ -598,7 +1044,6 @@ function updatePicksDisplay() {
             let prefix = '';
             if (pick.action === 'picked') prefix = 'PICK:';
             else if (pick.action === 'banned') prefix = 'BAN:';
-            else if (pick.action === 'protected') prefix = 'PROT:';
             
             item.textContent = `${prefix} ${pick.pick}`;
             container.appendChild(item);
@@ -617,11 +1062,13 @@ function updatePicksDisplay() {
     
     lastPickLogCount = currentCount;
     
-    // Update ban/protect display after picks update
-    updateBanProtectDisplay();
-    
     // Update pick indicators
     updatePickIndicators();
+    
+    // Update state pickBanLog for team picks display
+    state.pickBanLog = picks;
+    updateTeamPicks('left');
+    updateTeamPicks('right');
 }
 
 function updatePickIndicators() {
@@ -668,16 +1115,14 @@ function updatePickIndicators() {
 function updateBanProtectDisplay() {
     const picks = getPicks();
     
-    // Get ban and protect elements
+    // Get ban elements
     const p1ban0 = document.getElementById('p1ban_0');
     const p1ban1 = document.getElementById('p1ban_1');
     const p2ban0 = document.getElementById('p2ban_0');
     const p2ban1 = document.getElementById('p2ban_1');
-    const p1prot0 = document.getElementById('p1prot_0');
-    const p2prot0 = document.getElementById('p2prot_0');
     
     // Clear all slots
-    const allSlots = [p1ban0, p1ban1, p2ban0, p2ban1, p1prot0, p2prot0];
+    const allSlots = [p1ban0, p1ban1, p2ban0, p2ban1];
     allSlots.forEach(slot => {
         if (slot) {
             slot.textContent = '';
@@ -685,11 +1130,9 @@ function updateBanProtectDisplay() {
         }
     });
     
-    // Get bans and protects for each player
+    // Get bans for each player
     const p1Bans = picks.filter(p => p.action === 'banned' && p.player === 1);
     const p2Bans = picks.filter(p => p.action === 'banned' && p.player === 2);
-    const p1Protects = picks.filter(p => p.action === 'protected' && p.player === 1);
-    const p2Protects = picks.filter(p => p.action === 'protected' && p.player === 2);
     
     // Fill ban slots
     if (p1ban0 && p1Bans[0]) {
@@ -707,16 +1150,6 @@ function updateBanProtectDisplay() {
     if (p2ban1 && p2Bans[1]) {
         p2ban1.textContent = p2Bans[1].pick;
         p2ban1.classList.add('filled');
-    }
-    
-    // Fill protect slots
-    if (p1prot0 && p1Protects[0]) {
-        p1prot0.textContent = p1Protects[0].pick;
-        p1prot0.classList.add('filled');
-    }
-    if (p2prot0 && p2Protects[0]) {
-        p2prot0.textContent = p2Protects[0].pick;
-        p2prot0.classList.add('filled');
     }
 }
 
@@ -765,6 +1198,50 @@ document.addEventListener('DOMContentLoaded', () => {
             clearAllPicks();
         });
     }
+    
+    // === Team/points initialization ===
+    // Fetch team data on load
+    fetchTeams().then(() => {
+    });
+
+    // Poll for match changes every 2 seconds
+    setInterval(async () => {
+        const currentMatch = JSON.parse(localStorage.getItem('peg-current-match') || 'null');
+        if (currentMatch &&
+            (currentMatch.team1Name !== state.currentMatch?.team1Name ||
+             currentMatch.team2Name !== state.currentMatch?.team2Name)) {
+            state.currentMatch = currentMatch;
+            els.teamLeftName.textContent = truncateName(currentMatch.team1Name || 'TEAM LEFT');
+            els.teamRightName.textContent = truncateName(currentMatch.team2Name);
+            
+            try {
+                const teamsResponse = await fetch('../data/teams.json');
+                const teamsData = await teamsResponse.json();
+                
+                const normalizedTeam1Name = normalizeTeamName(currentMatch.team1Name);
+                const normalizedTeam2Name = normalizeTeamName(currentMatch.team2Name);
+                const team1 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam1Name);
+                const team2 = teamsData.teams.find(t => normalizeTeamName(t.name) === normalizedTeam2Name);
+                
+                if (team1) {
+                    els.teamLeftName.textContent = truncateName(team1.name);
+                    if (els.teamLeftLogo && team1.teamId) {
+                        els.teamLeftLogo.src = `../data/logos/${team1.teamId}.png`;
+                    }
+                }
+                if (team2) {
+                    els.teamRightName.textContent = truncateName(team2.name);
+                    if (els.teamRightLogo && team2.teamId) {
+                        els.teamRightLogo.src = `../data/logos/${team2.teamId}.png`;
+                    }
+                    
+                }
+                
+            } catch (error) {
+                console.error('Error loading teams.json during poll:', error);
+            }
+        }
+    }, 2000);
 });
 
 function clearAllPicks() {
@@ -808,7 +1285,7 @@ function updateMapCardStatuses() {
         card.dataset.currentState = newState || '';
         
         // Remove old states
-        card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2', 'protected');
+        card.classList.remove('picked-by-1', 'picked-by-2', 'banned-by-1', 'banned-by-2');
         const oldLabel = card.querySelector('.map-status-label');
         if (oldLabel) oldLabel.remove();
         
@@ -822,8 +1299,6 @@ function updateMapCardStatuses() {
             triggerStrobeFlash(card, parseInt(player));
         } else if (action === 'banned') {
             card.classList.add(`banned-by-${player}`);
-        } else if (action === 'protected') {
-            card.classList.add('protected');
         }
         
         // Add label
@@ -856,9 +1331,6 @@ function addStatusLabel(card, action, player, beatmapId) {
     } else if (action === 'banned') {
         statusText = `BANNED BY ${teamName}`;
         statusClass = 'banned';
-    } else if (action === 'protected') {
-        statusText = `PROTECTED BY ${teamName}`;
-        statusClass = 'protected';
     }
     
     if (statusText) {
@@ -870,31 +1342,36 @@ function addStatusLabel(card, action, player, beatmapId) {
 }
 
 // Twitch chat connection
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof tmi !== 'undefined') {
-        const twitchClient = new tmi.Client({
-            channels: ['purlstournaments']
-        });
+const twitchClient = new tmi.Client({
+    channels: ['purlstournaments']
+});
 
-        twitchClient.connect().catch(console.error);
+twitchClient.connect().catch(console.error);
 
-        twitchClient.on('message', (channel, tags, message, self) => {
-            if (self) return;
-            const container = document.getElementById('twitch-messages');
-            if (!container) return;
-            const msg = document.createElement('div');
-            msg.className = 'twitch-message';
-            const name = document.createElement('span');
-            name.className = 'twitch-name';
-            name.textContent = (tags['display-name'] || tags.username) + ': ';
-            const text = document.createElement('span');
-            text.className = 'twitch-text';
-            text.textContent = message;
-            msg.appendChild(name);
-            msg.appendChild(text);
-            container.appendChild(msg);
-            while (container.children.length > 20) container.removeChild(container.firstChild);
-            container.scrollTop = container.scrollHeight;
-        });
+twitchClient.on('message', (channel, tags, message, self) => {
+    if (self) return;
+    const container = document.getElementById('twitch-messages');
+    if (!container) return;
+    
+    const msg = document.createElement('div');
+    msg.className = 'twitch-message';
+    
+    const name = document.createElement('span');
+    name.className = 'twitch-name';
+    name.textContent = tags['display-name'] || tags.username;
+    
+    const text = document.createElement('span');
+    text.className = 'twitch-text';
+    text.textContent = message;
+    
+    msg.appendChild(name);
+    msg.appendChild(text);
+    container.appendChild(msg);
+    
+    // Keep only last 20 messages
+    while (container.children.length > 20) {
+        container.removeChild(container.firstChild);
     }
+    
+    container.scrollTop = container.scrollHeight;
 });

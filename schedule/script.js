@@ -69,7 +69,8 @@ async function loadSchedule() {
         // Filter to only upcoming matches
         const now = new Date();
         const upcomingMatches = processedMatches.filter(match => {
-            const matchDate = parseToUTC8(match.date || match.dateTime);
+            const dateStr = (match.date || '') + ' ' + (match.time || '');
+            const matchDate = parseToUTC8(dateStr || match.dateTime);
             return matchDate && matchDate.getTime() > now.getTime();
         });
         
@@ -234,7 +235,7 @@ function getMatchStatus(matchDate, matchTime) {
 function parseToUTC8(dateStr) {
     // Expected format: "May 2 9:30PM" or "May 2, 2026 9:30PM"
     // Remove any timezone suffix
-    const cleanStr = dateStr.replace(/\s*UTC[+-]\d+:?\d*/i, '').trim();
+    const cleanStr = dateStr.replace(/^\([^)]+\)\s*/, '').replace(/\s*UTC[+-]\d+:?\d*/i, '').trim();
     
     // Parse as if it's UTC+8
     const parsed = new Date(cleanStr);

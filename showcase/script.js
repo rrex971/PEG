@@ -38,7 +38,7 @@ let tempMods = -1;
 let mappool = {};
 let customEntries = [];
 
-fetch('mappool.json')
+fetch('../data/mappool.json')
     .then(response => response.json())
     .then(data => {
         mappool = data;

@@ -167,6 +167,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    padding-bottom: 6px;
 }
 
 #team-left-side {
@@ -254,13 +255,6 @@ body {
     text-decoration: line-through;
 }
 
-/* Protects — green */
-.pick-tag.protect {
-    background: rgba(80, 200, 120, 0.2);
-    color: #50c878;
-    border: 1px solid rgba(80, 200, 120, 0.4);
-}
-
 /* Empty slots for bans/protects */
 .pick-tag.empty {
     opacity: 0.3;
@@ -303,119 +297,6 @@ body {
     color: var(--peg-coral);
 }
 
-
-/* Player Slots */
-.player-slots {
-    display: flex;
-    gap: 6px;
-}
-
-/* Players Row - flex container for player slots and overflow indicator */
-.players-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.player-slot {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 6px 2px 2px;
-    border-radius: 12px;
-    background: var(--peg-white);
-    transition: all 0.3s ease;
-    will-change: transform;
-}
-
-/* Active state: filled white with team-colored text */
-.player-slot.active {
-    background: var(--peg-white);
-}
-
-.player-slot.active .player-name {
-    color: var(--peg-ink);
-    opacity: 1;
-}
-
-.player-slot.active .player-avatar {
-    border-color: var(--peg-yellow);
-}
-
-#team-right-side .player-slot.active .player-avatar {
-    border-color: var(--peg-coral);
-}
-
-/* Inactive state: outline gray with gray text */
-.player-slot:not(.active) {
-    background: transparent;
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-}
-
-.player-slot:not(.active) .player-name {
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.player-slot:not(.active) .player-avatar {
-    opacity: 0.4;
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.player-avatar {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    flex-shrink: 0;
-}
-
-.player-name {
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: var(--peg-ink);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 60px;
-}
-
-/* Benched Label */
-.benched-label {
-    font-family: 'Lexend', sans-serif;
-    font-size: 0.6rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: -5px;
-}
-
-/* Overflow indicator for benched players */
-.overflow-indicator {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: var(--peg-white);
-    flex-shrink: 0;
-}
-
-/* Hide active players from benched area */
-.player-slot.in-lobby {
-    display: none;
-}
-
-/* Hide slots beyond the 4th visible benched player */
-.player-slot.overflow-hidden {
-    display: none !important;
-}
 
 /* Score Bar */
 #score-bar {
@@ -569,7 +450,7 @@ body {
 }
 
 
-.team-bans, .team-protects {
+.team-bans {
     display: flex;
     gap: 4px;
     align-items: center;
@@ -580,16 +461,6 @@ body {
     color: var(--peg-white);
     padding: 2px 8px;
     height: 30px;
-    border-radius: 8px;
-    font-size: 0.7rem;
-    font-family: 'Lexend', sans-serif;
-    font-weight: 700;
-}
-
-.protect-badge {
-    background: #64ff74;
-    color: var(--peg-ink);
-    padding: 2px 8px;
     border-radius: 8px;
     font-size: 0.7rem;
     font-family: 'Lexend', sans-serif;
@@ -677,18 +548,6 @@ body {
     background-color: rgba(122, 83, 83, 0.8);
     color: var(--peg-coral);
     text-decoration: line-through;
-    border-color: var(--peg-coral);
-}
-
-.pick-log-item.protect.team-left {
-    background-color: rgba(83, 122, 83, 0.8);
-    color: var(--peg-yellow);
-    border-color: var(--peg-yellow);
-}
-
-.pick-log-item.protect.team-right {
-    background-color: rgba(83, 122, 83, 0.8);
-    color: var(--peg-coral);
     border-color: var(--peg-coral);
 }
 
@@ -975,6 +834,16 @@ body {
 .twitch-text {
     color: var(--peg-white);
     word-break: break-word;
+}
+
+/* Twitch Messages Container - must match #chat-messages for scrolling */
+#twitch-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-right: 5px;
 }
 
 .panel-label {

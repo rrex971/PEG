@@ -60,9 +60,61 @@
         <!-- Maps container -->
         <div id="maps"></div>
 
-        <!-- Pick/Ban Log (thin horizontal line at bottom) -->
-        <div id="pick-log">
-            <div id="pick-log-items"></div>
+        <!-- Team Info + Player Slots + Score Bar Area -->
+        <div id="team-score-area">
+            <!-- Score Bar with Progressive Fill from Center (at very top) -->
+            <div id="score-bar">
+                <div id="score-bar-track">
+                    <div id="score-bar-left"></div>
+                    <div id="score-bar-right"></div>
+                </div>
+            </div>
+
+            <!-- Live Scores at Opposite Ends (below scorebar) -->
+            <div id="live-scores">
+                <span id="score-left" class="team-score">0</span>
+                <span id="score-diff">0</span>
+                <span id="score-right" class="team-score">0</span>
+            </div>
+
+            <!-- Points Center (absolutely centered) -->
+            <div id="points-center">
+                <div id="points-left-dots" class="points"></div>
+                <span id="points-number-left" class="points-number">0</span>
+                <div id="vs-pill"></div>
+                <span id="points-number-right" class="points-number">0</span>
+                <div id="points-right-dots" class="points"></div>
+            </div>
+
+            <!-- Pick/Ban Log (thin horizontal line at bottom) -->
+            <div id="pick-log">
+                <div id="pick-log-items"></div>
+            </div>
+
+            <!-- Team Blocks Container (at bottom, aligned to edges) -->
+            <div id="team-blocks-container">
+                <!-- Left Team Side -->
+                <div class="team-side" id="team-left-side">
+                    <div class="team-header">
+                        <img id="team-left-logo" class="team-logo" src="" alt="" />
+                        <div class="team-info">
+                            <div id="team-left-name" class="team-name">TEAM LEFT</div>
+                            <div id="team-left-picks" class="team-picks"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Team Side -->
+                <div class="team-side" id="team-right-side">
+                    <div class="team-header">
+                        <div class="team-info">
+                            <div id="team-right-name" class="team-name">TEAM RIGHT</div>
+                            <div id="team-right-picks" class="team-picks"></div>
+                        </div>
+                        <img id="team-right-logo" class="team-logo" src="" alt="" />
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Bottom Panel (resized to ~135px) -->

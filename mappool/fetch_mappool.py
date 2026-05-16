@@ -11,8 +11,8 @@ from osu import AuthHandler, Client, Scope
 # Configuration
 CLIENT_ID = 20810
 CLIENT_SECRET = "tNVBdaVDZL3naL2fZDUFrRQOwhFo8aGgg9bLB0Es"
-MAPPPOOL_JSON_PATH = "../showcase/mappool.json"
-OUTPUT_PATH = "mappool_full.json"
+MAPPPOOL_JSON_PATH = "../data/mappool.json"
+OUTPUT_PATH = "../data/mappool_full.json"
 
 # Rate limiting delay (seconds)
 REQUEST_DELAY = 0.2

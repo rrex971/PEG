@@ -70,7 +70,7 @@ async function loadData() {
         }
 
         // Load mappool data
-        const mappoolResponse = await fetch('../mappool/mappool_full.json');
+        const mappoolResponse = await fetch('../data/mappool_full.json');
         mappoolData = await mappoolResponse.json();
         console.log('Mappool data loaded:', mappoolData);
 
