@@ -94,8 +94,8 @@ body {
     bottom: 335px; /* leaves room for team-score-area (200px) + bottom-panel (135px) */
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 10px 20px;
+    gap: 10px;
+    padding: 8px 16px;
     box-sizing: border-box;
     overflow-y: auto;
 }
@@ -563,7 +563,7 @@ body {
 /* Mod row container */
 .mod-row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
 }
 
@@ -572,10 +572,10 @@ body {
 .map {
     display: flex;
     align-items: stretch;
-    width: 320px;
-    min-height: 80px;
+    width: 275px;
+    min-height: 70px;
     border: 3px solid;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     position: relative;
     background: var(--peg-ink);
@@ -596,11 +596,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 36px;
-    padding: 0 8px;
+    min-width: 32px;
+    padding: 0 6px;
     border-radius: 0 0 0 0px;
     font-family: MoonGET;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     letter-spacing: 0.1em;
     font-weight: 700;
     color: var(--peg-white);
@@ -618,7 +618,7 @@ body {
 /* Map Details - Right side */
 .map-details {
     flex: 1;
-    padding: 12px 16px;
+    padding: 10px 14px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -627,25 +627,25 @@ body {
 }
 
 .map-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--peg-white);
 }
 
 .map-artist {
-    font-size: 1rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.7);
 }
 
 .map-version {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.5);
     font-style: italic;
 }
 
 .map-mapper {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     opacity: 0.7;
     margin-top: 2px;
 }
@@ -653,10 +653,10 @@ body {
 /* Custom Label - Thin, floating top-right with cog icon */
 .custom-label {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    max-height: 20px;
-    font-size: 0.6rem;
+    top: 5px;
+    right: 5px;
+    max-height: 18px;
+    font-size: 0.55rem;
     font-weight: 800;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -666,13 +666,13 @@ body {
     align-items: center;
     z-index: 2;
     background: var(--peg-yellow);
-    border-radius: 8px;
-    padding: 2px 6px;
+    border-radius: 6px;
+    padding: 2px 5px;
 }
 
 .custom-label::before {
     content: '⚙';
-    font-size: 0.7rem;
+    font-size: 0.6rem;
 }
 
 /* Map Overlay - Fix to cover entire card */
@@ -1063,9 +1063,9 @@ body {
 /* Map Status Tooltip - appears on pick/ban/protect */
 .map-status {
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    font-size: 0.75rem;
+    bottom: 4px;
+    right: 4px;
+    font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -1100,8 +1100,8 @@ body {
 }
 
 .map-status.visible {
-    height: 22px;
-    padding: 2px 8px;
+    height: 20px;
+    padding: 2px 6px;
 }
 
 /* New pick slide-in animation */
@@ -1202,14 +1202,14 @@ body {
 /* Status label */
 .map-status-label {
     position: absolute;
-    bottom: 6px;
-    right: 6px;
-    font-size: 0.7rem;
+    bottom: 5px;
+    right: 5px;
+    font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 3px 8px;
+    border-radius: 5px;
     z-index: 5;
     animation: labelSlideIn 0.3s ease-out;
 }
